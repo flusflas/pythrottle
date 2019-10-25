@@ -1,9 +1,9 @@
 import asyncio
-from time import perf_counter, sleep
+from time import perf_counter
 
 import uvloop
 
-from metronome import Metronome
+from src.metronome import Metronome
 
 
 met = None      # type: Metronome
