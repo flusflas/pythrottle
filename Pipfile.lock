@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2600e89266dcdec0816ac37e2b9d4e215d85404ed265694cd938684eeca85ac7"
+            "sha256": "9646f930d79e6ec72293cc7225286a61e970bc34a8ec963277e90f35ebcdf570"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -15,7 +15,8 @@
             }
         ]
     },
-    "default": {
+    "default": {},
+    "develop": {
         "uvloop": {
             "hashes": [
                 "sha256:0deb6c97c5807c792dd9024bab90e6ca49e981862103cb2ea37b430c1ca0a267",
@@ -29,6 +30,5 @@
             "index": "pypi",
             "version": "==0.13.0"
         }
-    },
-    "develop": {}
+    }
 }
