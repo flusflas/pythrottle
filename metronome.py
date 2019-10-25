@@ -13,22 +13,26 @@ class Metronome:
         self.started = False
         self.start()
 
+    def _get_interval(self, interval=None):
+        interval = interval if interval else self.interval
+        if not interval:
+            raise Exception("interval not defined")
+        return interval
+
     def start(self):
         self.t_start = perf_counter()
         self.ticks = 0
         self.started = True
 
     def elapsed(self, seconds=None):
-        seconds = seconds if seconds else self.interval
-        if not seconds:
-            raise Exception("interval not defined")
+        seconds = self._get_interval(seconds)
         if self.available:
             self.available -= 1
             return True
         return False
 
     async def wait_until_available(self, seconds=None):
-        seconds = seconds if seconds else self.interval
+        seconds = self._get_interval(seconds)
         async with self.sem:
             self.ticks += 1
             await asyncio.sleep((self.t_start + self.ticks * seconds) - perf_counter())
