@@ -7,7 +7,7 @@ from metronome import Metronome
 
 
 met = None      # type: Metronome
-rate = 100000
+rate = 1000
 
 t_init = 0
 sem = asyncio.Semaphore()
@@ -30,9 +30,9 @@ async def main():
     sem = asyncio.Semaphore()
     met = Metronome(1 / rate)
 
-    iter_count = 500000
+    iter_count = 5000
 
-    # met.start()
+    met.start()
     t_init = perf_counter()
     t_start = perf_counter()
     await asyncio.gather(*(test_interval(i) for i in range(iter_count)))
@@ -42,7 +42,7 @@ async def main():
     print("------------------------")
     await asyncio.sleep(5)
 
-    # et.start()
+    met.start()
     t_start = perf_counter()
     await asyncio.gather(*(test_interval(i) for i in range(iter_count)))
     t_end = perf_counter()
