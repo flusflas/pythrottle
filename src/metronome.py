@@ -3,9 +3,12 @@ from time import perf_counter
 
 
 class Metronome:
-    def __init__(self, interval=None, loop=None):
+    def __init__(self, interval=None, auto_reset=True, exact=False, loop=None):
         self.interval = interval
+        self.auto_reset = auto_reset
+        self.exact = exact
         self.t_start = perf_counter()
+        self.t_next = 0
         self.timer = None
         self.available = 0
         self.ticks = 0
@@ -21,18 +24,22 @@ class Metronome:
 
     def start(self):
         self.t_start = perf_counter()
+        self.t_next = self.t_start
         self.ticks = 0
         self.started = True
 
     def elapsed(self, seconds=None):
         seconds = self._get_interval(seconds)
-        if self.available:
-            self.available -= 1
-            return True
-        return False
+        ret = (perf_counter() - self.t_next >= seconds)
+        if ret and self.auto_reset:
+            if self.exact:
+                self.t_next += seconds
+            else:
+                self.t_next = perf_counter()
+        return ret
 
     async def wait_until_available(self, seconds=None):
         seconds = self._get_interval(seconds)
-        async with self.sem:
+        async with self.sem:    # TODO: Semaphore seems not necessary...
             self.ticks += 1
             await asyncio.sleep((self.t_start + self.ticks * seconds) - perf_counter())
