@@ -7,15 +7,16 @@ import uvloop
 from src.metronome import Metronome
 
 uvloop.install()
-rate = 100000
+RATE = 100000
 MAX_ERROR = 0.03
+TESTS_DURATION = 5
 
 
 def test_sync_elapsed():
-    met = Metronome(interval=(1 / rate))
-    iter_count = 4 * rate
+    met = Metronome(interval=(1 / RATE))
+    iter_count = TESTS_DURATION * RATE
     t_start = time.perf_counter()
-    sleep_time = (0.01 / rate) if (0.01 / rate) < 0.001 else 0.001
+    sleep_time = (0.01 / RATE) if (0.01 / RATE) < 0.001 else 0.001
     for i in range(iter_count):
         while not met.elapsed(exact=True):
             time.sleep(sleep_time)
@@ -23,15 +24,15 @@ def test_sync_elapsed():
     t_end = time.perf_counter()
     elapsed = t_end - t_start
     measured_rate = iter_count / elapsed
-    error = 100 * (1 - measured_rate / rate)
+    error = 100 * (1 - measured_rate / RATE)
 
     print(f"Sync Rate: {measured_rate}, Error: {error:.3f}%")
     assert abs(error) < MAX_ERROR
 
 
 def test_sync_sleep():
-    met = Metronome(interval=(1 / rate))
-    iter_count = 4 * rate
+    met = Metronome(interval=(1 / RATE))
+    iter_count = TESTS_DURATION * RATE
     t_start = time.perf_counter()
     for i in range(iter_count):
         met.sleep_until_available()
@@ -39,7 +40,7 @@ def test_sync_sleep():
     t_end = time.perf_counter()
     elapsed = t_end - t_start
     measured_rate = iter_count / elapsed
-    error = 100 * (1 - measured_rate / rate)
+    error = 100 * (1 - measured_rate / RATE)
 
     print(f"Sync Rate: {measured_rate}, Error: {error:.3f}%")
     assert abs(error) < MAX_ERROR
@@ -47,8 +48,8 @@ def test_sync_sleep():
 
 @pytest.mark.asyncio
 async def test_async_wait():
-    met = Metronome(interval=(1 / rate))
-    iter_count = 4 * rate
+    met = Metronome(interval=(1 / RATE))
+    iter_count = TESTS_DURATION * RATE
     t_start = time.perf_counter()
     # Split async tasks in chunks to avoid large number of tasks in the loop
     # (which reduce performace for high rates and distorts the test)
@@ -61,7 +62,7 @@ async def test_async_wait():
     t_end = time.perf_counter()
     elapsed = t_end - t_start
     measured_rate = iter_count / elapsed
-    error = 100 * (1 - measured_rate / rate)
+    error = 100 * (1 - measured_rate / RATE)
     print(f"Async Rate: {measured_rate}, Error: {error:.3f}%")
     assert abs(error) < MAX_ERROR
 
