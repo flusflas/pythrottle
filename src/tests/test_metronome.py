@@ -16,9 +16,10 @@ def test_sync_elapsed():
     iter_count = 4 * rate
     count = 0
     t_start = time.perf_counter()
+    sleep_time = (0.01 / rate) if (0.01 / rate) < 0.001 else 0.001
     for i in range(iter_count):
         while not met.elapsed():
-            time.sleep(0.1 / rate)
+            time.sleep(sleep_time)
         count += 1
 
     t_end = time.perf_counter()
