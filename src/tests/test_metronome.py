@@ -9,7 +9,7 @@ from src.tests.profiler import Profiler
 
 uvloop.install()
 RATE = 100000
-MAX_ERROR = 0.03
+MAX_ERROR = 0.03 / 100
 TESTS_DURATION = 5
 
 
@@ -24,13 +24,13 @@ def test_sync_elapsed_exact():
                 time.sleep(sleep_time)
 
     print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(100 * profiler.error) < MAX_ERROR
+    assert abs(profiler.error) < MAX_ERROR
 
 
 def test_sync_elapsed_inexact():
     rate = 5
     simulated_rate = 4
-    max_error = 1.0
+    max_error = 0.01
     met = Metronome(interval=(1 / rate))
     iter_count = TESTS_DURATION * rate
 
@@ -40,7 +40,7 @@ def test_sync_elapsed_inexact():
                 time.sleep(1 / simulated_rate)
 
     print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(100 * profiler.error) < max_error
+    assert abs(profiler.error) < max_error
 
 
 def test_sync_sleep():
@@ -52,7 +52,7 @@ def test_sync_sleep():
             met.sleep_until_available()
 
     print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(100 * profiler.error) < MAX_ERROR
+    assert abs(profiler.error) < MAX_ERROR
 
 
 @pytest.mark.asyncio
@@ -72,7 +72,7 @@ async def test_async_wait():
             await asyncio.gather(*(aux_test_async_wait(met) for _ in range(size)))
 
     print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(100 * profiler.error) < MAX_ERROR
+    assert abs(profiler.error) < MAX_ERROR
 
 
 async def aux_test_async_wait(met: Metronome):
