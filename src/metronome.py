@@ -1,5 +1,5 @@
 import asyncio
-from time import perf_counter
+from time import perf_counter, sleep
 
 
 class Metronome:
@@ -33,6 +33,15 @@ class Metronome:
             else:
                 self.t_start = perf_counter()
         return ret
+
+    def sleep_until_available(self, seconds=None):
+        seconds = self._get_interval(seconds)
+        t_target = (self.t_start + seconds)
+        self.t_start += seconds
+        sleep_time = t_target - perf_counter()
+        if sleep_time > 0:
+            sleep(sleep_time)
+        self.ticks += 1
 
     async def wait_until_available(self, seconds=None):
         seconds = self._get_interval(seconds)

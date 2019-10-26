@@ -14,13 +14,27 @@ MAX_ERROR = 0.03
 def test_sync_elapsed():
     met = Metronome(interval=(1 / rate), exact=True)
     iter_count = 4 * rate
-    count = 0
     t_start = time.perf_counter()
     sleep_time = (0.01 / rate) if (0.01 / rate) < 0.001 else 0.001
     for i in range(iter_count):
         while not met.elapsed():
             time.sleep(sleep_time)
-        count += 1
+
+    t_end = time.perf_counter()
+    elapsed = t_end - t_start
+    measured_rate = iter_count / elapsed
+    error = 100 * (1 - measured_rate / rate)
+
+    print(f"Sync Rate: {measured_rate}, Error: {error:.3f}%")
+    assert abs(error) < MAX_ERROR
+
+
+def test_sync_sleep():
+    met = Metronome(interval=(1 / rate), exact=True)
+    iter_count = 4 * rate
+    t_start = time.perf_counter()
+    for i in range(iter_count):
+        met.sleep_until_available()
 
     t_end = time.perf_counter()
     elapsed = t_end - t_start
