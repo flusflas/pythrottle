@@ -13,6 +13,12 @@ MAX_ERROR = 0.03 / 100
 TESTS_DURATION = 5
 
 
+def test_interval_missing():
+    met = Metronome()
+    with pytest.raises(ValueError):
+        met.elapsed()
+
+
 def test_sync_elapsed_exact():
     met = Metronome(interval=(1 / RATE))
     iter_count = TESTS_DURATION * RATE
