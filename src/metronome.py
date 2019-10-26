@@ -9,7 +9,6 @@ class Metronome:
         self.exact = exact
         self.t_start = perf_counter()
         self.timer = None
-        self.available = 0
         self.ticks = 0
         self.started = False
         self.start()
