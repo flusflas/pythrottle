@@ -5,6 +5,7 @@ import pytest
 import uvloop
 
 from src.metronome import Metronome
+from src.tests.profiler import Profiler
 
 uvloop.install()
 RATE = 100000
@@ -15,75 +16,63 @@ TESTS_DURATION = 5
 def test_sync_elapsed_exact():
     met = Metronome(interval=(1 / RATE))
     iter_count = TESTS_DURATION * RATE
-    t_start = time.perf_counter()
-    sleep_time = (0.01 / RATE) if (0.01 / RATE) < 0.001 else 0.001
-    for i in range(iter_count):
-        while not met.elapsed(exact=True):
-            time.sleep(sleep_time)
 
-    t_end = time.perf_counter()
-    elapsed = t_end - t_start
-    measured_rate = iter_count / elapsed
-    error = 100 * (1 - measured_rate / RATE)
+    with Profiler(iter_count, target_rate=RATE) as profiler:
+        sleep_time = (0.01 / RATE) if (0.01 / RATE) < 0.001 else 0.001
+        for i in range(iter_count):
+            while not met.elapsed(exact=True):
+                time.sleep(sleep_time)
 
-    print(f"Sync Rate: {measured_rate}, Error: {error:.3f}%")
-    assert abs(error) < MAX_ERROR
+    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
+    assert abs(100 * profiler.error) < MAX_ERROR
 
 
 def test_sync_elapsed_inexact():
     rate = 5
     simulated_rate = 4
+    max_error = 1.0
     met = Metronome(interval=(1 / rate))
     iter_count = TESTS_DURATION * rate
-    t_start = time.perf_counter()
-    for i in range(iter_count):
-        while not met.elapsed(exact=False):
-            time.sleep(1 / simulated_rate)
 
-    t_end = time.perf_counter()
-    elapsed = t_end - t_start
-    measured_rate = iter_count / elapsed
-    error = 100 * (1 - measured_rate / simulated_rate)
+    with Profiler(iter_count, target_rate=simulated_rate) as profiler:
+        for i in range(iter_count):
+            while not met.elapsed(exact=False):
+                time.sleep(1 / simulated_rate)
 
-    print(f"Sync Rate: {measured_rate}, Error: {error:.3f}%")
-    assert abs(error) < 1.0
+    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
+    assert abs(100 * profiler.error) < max_error
 
 
 def test_sync_sleep():
     met = Metronome(interval=(1 / RATE))
     iter_count = TESTS_DURATION * RATE
-    t_start = time.perf_counter()
-    for i in range(iter_count):
-        met.sleep_until_available()
 
-    t_end = time.perf_counter()
-    elapsed = t_end - t_start
-    measured_rate = iter_count / elapsed
-    error = 100 * (1 - measured_rate / RATE)
+    with Profiler(iter_count, target_rate=RATE) as profiler:
+        for i in range(iter_count):
+            met.sleep_until_available()
 
-    print(f"Sync Rate: {measured_rate}, Error: {error:.3f}%")
-    assert abs(error) < MAX_ERROR
+    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
+    assert abs(100 * profiler.error) < MAX_ERROR
 
 
 @pytest.mark.asyncio
 async def test_async_wait():
     met = Metronome(interval=(1 / RATE))
     iter_count = TESTS_DURATION * RATE
-    t_start = time.perf_counter()
+
     # Split async tasks in chunks to avoid large number of tasks in the loop
     # (which reduce performace for high rates and distorts the test)
     remaining = iter_count
     max_tasks = 100
-    while remaining > 0:
-        size = remaining if remaining < max_tasks else max_tasks
-        remaining -= size
-        await asyncio.gather(*(aux_test_async_wait(met) for _ in range(size)))
-    t_end = time.perf_counter()
-    elapsed = t_end - t_start
-    measured_rate = iter_count / elapsed
-    error = 100 * (1 - measured_rate / RATE)
-    print(f"Async Rate: {measured_rate}, Error: {error:.3f}%")
-    assert abs(error) < MAX_ERROR
+
+    with Profiler(iter_count, target_rate=RATE) as profiler:
+        while remaining > 0:
+            size = remaining if remaining < max_tasks else max_tasks
+            remaining -= size
+            await asyncio.gather(*(aux_test_async_wait(met) for _ in range(size)))
+
+    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
+    assert abs(100 * profiler.error) < MAX_ERROR
 
 
 async def aux_test_async_wait(met: Metronome):
