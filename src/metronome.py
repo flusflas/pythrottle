@@ -3,10 +3,8 @@ from time import perf_counter, sleep
 
 
 class Metronome:
-    def __init__(self, interval=None, auto_reset=True, exact=False):
+    def __init__(self, interval=None):
         self.interval = interval
-        self.auto_reset = auto_reset
-        self.exact = exact
         self.t_start = perf_counter()
         self.timer = None
         self.ticks = 0
@@ -24,11 +22,11 @@ class Metronome:
         self.ticks = 0
         self.started = True
 
-    def elapsed(self, seconds=None):
+    def elapsed(self, seconds=None, auto_reset=True, exact=False):
         seconds = self._get_interval(seconds)
         ret = (perf_counter() - self.t_start >= seconds)
-        if ret and self.auto_reset:
-            if self.exact:
+        if ret and auto_reset:
+            if exact:
                 self.t_start += seconds
             else:
                 self.t_start = perf_counter()

@@ -12,12 +12,12 @@ MAX_ERROR = 0.03
 
 
 def test_sync_elapsed():
-    met = Metronome(interval=(1 / rate), exact=True)
+    met = Metronome(interval=(1 / rate))
     iter_count = 4 * rate
     t_start = time.perf_counter()
     sleep_time = (0.01 / rate) if (0.01 / rate) < 0.001 else 0.001
     for i in range(iter_count):
-        while not met.elapsed():
+        while not met.elapsed(exact=True):
             time.sleep(sleep_time)
 
     t_end = time.perf_counter()
@@ -30,7 +30,7 @@ def test_sync_elapsed():
 
 
 def test_sync_sleep():
-    met = Metronome(interval=(1 / rate), exact=True)
+    met = Metronome(interval=(1 / rate))
     iter_count = 4 * rate
     t_start = time.perf_counter()
     for i in range(iter_count):
@@ -47,7 +47,7 @@ def test_sync_sleep():
 
 @pytest.mark.asyncio
 async def test_async_wait():
-    met = Metronome(interval=(1 / rate), exact=True)
+    met = Metronome(interval=(1 / rate))
     iter_count = 4 * rate
     t_start = time.perf_counter()
     # Split async tasks in chunks to avoid large number of tasks in the loop
