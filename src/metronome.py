@@ -25,6 +25,7 @@ class Metronome:
         seconds = self._get_interval(seconds)
         ret = (perf_counter() - self.t_start >= seconds)
         if ret and auto_reset:
+            self.ticks += 1
             if exact:
                 self.t_start += seconds
             else:
