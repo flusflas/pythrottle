@@ -21,7 +21,7 @@ class Metronome:
         self.ticks = 0
         self.started = True
 
-    def elapsed(self, seconds=None, auto_reset=True, exact=False):
+    def elapsed(self, seconds=None, auto_reset=True, exact=True):
         seconds = self._get_interval(seconds)
         ret = (perf_counter() - self.t_start >= seconds)
         if ret and auto_reset:
