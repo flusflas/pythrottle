@@ -47,3 +47,12 @@ class Metronome:
         self.t_start += seconds
         await asyncio.sleep(t_target - perf_counter())
         self.ticks += 1
+
+    def sleep_loop(self, seconds=None, max_ticks=None):
+        seconds = self._get_interval(seconds)
+        ticks = 0
+        while max_ticks is None or ticks < max_ticks:
+            if max_ticks:
+                ticks += 1
+            self.sleep_until_available(seconds)
+            yield ticks

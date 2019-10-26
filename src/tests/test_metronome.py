@@ -64,6 +64,20 @@ def test_sync_sleep():
     assert met.ticks == iter_count
 
 
+def test_sync_sleep_loop():
+    met = Metronome(interval=(1 / RATE))
+    iter_count = TESTS_DURATION * RATE
+
+    with Profiler(iter_count, target_rate=RATE) as profiler:
+        for i in met.sleep_loop(max_ticks=iter_count):
+            pass
+
+    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
+    assert abs(profiler.error) < MAX_ERROR
+    assert met.ticks == iter_count
+    assert i == iter_count
+
+
 @pytest.mark.asyncio
 async def test_async_wait():
     met = Metronome(interval=(1 / RATE))
