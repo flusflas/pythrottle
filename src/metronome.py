@@ -13,7 +13,7 @@ class Metronome:
     def _get_interval(self, interval=None):
         interval = interval if interval else self.interval
         if not interval:
-            raise Exception("interval not defined")
+            raise ValueError("interval not defined")
         return interval
 
     def start(self):
