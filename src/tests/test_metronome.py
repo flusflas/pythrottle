@@ -63,6 +63,9 @@ async def test_async_wait():
     met = Metronome(interval=(1 / RATE))
     iter_count = TESTS_DURATION * RATE
 
+    async def aux_task(m: Metronome):
+        await m.wait_until_available()
+
     # Split async tasks in chunks to avoid large number of tasks in the loop
     # (which reduce performace for high rates and distorts the test)
     remaining = iter_count
@@ -72,12 +75,8 @@ async def test_async_wait():
         while remaining > 0:
             size = remaining if remaining < max_tasks else max_tasks
             remaining -= size
-            await asyncio.gather(*(aux_test_async_wait(met) for _ in range(size)))
+            await asyncio.gather(*(aux_task(met) for _ in range(size)))
 
     print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
     assert abs(profiler.error) < MAX_ERROR
     assert met.ticks == iter_count
-
-
-async def aux_test_async_wait(met: Metronome):
-    await met.wait_until_available()
