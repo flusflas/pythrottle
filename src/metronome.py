@@ -6,7 +6,6 @@ class Metronome:
     def __init__(self, interval=None):
         self.interval = interval
         self.t_start = perf_counter()
-        self.timer = None
         self.ticks = 0
         self.started = False
         self.start()
