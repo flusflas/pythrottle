@@ -12,7 +12,7 @@ MAX_ERROR = 0.03
 TESTS_DURATION = 5
 
 
-def test_sync_elapsed():
+def test_sync_elapsed_exact():
     met = Metronome(interval=(1 / RATE))
     iter_count = TESTS_DURATION * RATE
     t_start = time.perf_counter()
@@ -28,6 +28,25 @@ def test_sync_elapsed():
 
     print(f"Sync Rate: {measured_rate}, Error: {error:.3f}%")
     assert abs(error) < MAX_ERROR
+
+
+def test_sync_elapsed_inexact():
+    rate = 5
+    simulated_rate = 4
+    met = Metronome(interval=(1 / rate))
+    iter_count = TESTS_DURATION * rate
+    t_start = time.perf_counter()
+    for i in range(iter_count):
+        while not met.elapsed(exact=False):
+            time.sleep(1 / simulated_rate)
+
+    t_end = time.perf_counter()
+    elapsed = t_end - t_start
+    measured_rate = iter_count / elapsed
+    error = 100 * (1 - measured_rate / simulated_rate)
+
+    print(f"Sync Rate: {measured_rate}, Error: {error:.3f}%")
+    assert abs(error) < 1.0
 
 
 def test_sync_sleep():
