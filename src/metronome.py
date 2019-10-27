@@ -56,3 +56,12 @@ class Metronome:
                 ticks += 1
             self.sleep_until_available(seconds)
             yield ticks
+
+    async def wait_loop(self, seconds=None, max_ticks=None):
+        seconds = self._get_interval(seconds)
+        ticks = 0
+        while max_ticks is None or ticks < max_ticks:
+            if max_ticks:
+                ticks += 1
+            await self.wait_until_available(seconds)
+            yield ticks
