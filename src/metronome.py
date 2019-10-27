@@ -7,7 +7,7 @@ class Metronome:
         self.interval = interval
         self.t_start = perf_counter()
         self.ticks = 0
-        self.start()
+        self.restart()
 
     def _get_interval(self, interval=None):
         interval = interval if interval else self.interval
@@ -15,7 +15,7 @@ class Metronome:
             raise ValueError("interval not defined")
         return interval
 
-    def start(self):
+    def restart(self):
         self.t_start = perf_counter()
         self.ticks = 0
 
