@@ -5,14 +5,16 @@ from time import perf_counter, sleep
 class Metronome:
     def __init__(self, interval=None):
         self.interval = interval
-        self.t_start = perf_counter()
+        self.t_start = None
         self.ticks = 0
         self.restart()
 
-    def _get_interval(self, interval=None):
+    def _get_interval_and_check(self, interval=None):
         interval = interval if interval else self.interval
         if not interval:
             raise ValueError("interval not defined")
+        if self.t_start is None:
+            self.restart()
         return interval
 
     def restart(self):
@@ -20,7 +22,7 @@ class Metronome:
         self.ticks = 0
 
     def elapsed(self, seconds=None, auto_reset=True, exact=True):
-        seconds = self._get_interval(seconds)
+        seconds = self._get_interval_and_check(seconds)
         ret = (perf_counter() - self.t_start >= seconds)
         if ret and auto_reset:
             self.ticks += 1
@@ -31,7 +33,7 @@ class Metronome:
         return ret
 
     def sleep_until_available(self, seconds=None):
-        seconds = self._get_interval(seconds)
+        seconds = self._get_interval_and_check(seconds)
         t_target = (self.t_start + seconds)
         self.t_start += seconds
         sleep_time = t_target - perf_counter()
@@ -40,14 +42,14 @@ class Metronome:
         self.ticks += 1
 
     async def wait_until_available(self, seconds=None):
-        seconds = self._get_interval(seconds)
+        seconds = self._get_interval_and_check(seconds)
         t_target = (self.t_start + seconds)
         self.t_start += seconds
         await asyncio.sleep(t_target - perf_counter())
         self.ticks += 1
 
     def sleep_loop(self, seconds=None, max_ticks=None):
-        seconds = self._get_interval(seconds)
+        seconds = self._get_interval_and_check(seconds)
         ticks = 0
         while max_ticks is None or ticks < max_ticks:
             if max_ticks:
@@ -56,7 +58,7 @@ class Metronome:
             yield ticks
 
     async def wait_loop(self, seconds=None, max_ticks=None):
-        seconds = self._get_interval(seconds)
+        seconds = self._get_interval_and_check(seconds)
         ticks = 0
         while max_ticks is None or ticks < max_ticks:
             if max_ticks:
