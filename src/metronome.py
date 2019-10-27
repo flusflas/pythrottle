@@ -7,7 +7,6 @@ class Metronome:
         self.interval = interval
         self.t_start = perf_counter()
         self.ticks = 0
-        self.started = False
         self.start()
 
     def _get_interval(self, interval=None):
@@ -19,7 +18,6 @@ class Metronome:
     def start(self):
         self.t_start = perf_counter()
         self.ticks = 0
-        self.started = True
 
     def elapsed(self, seconds=None, auto_reset=True, exact=True):
         seconds = self._get_interval(seconds)
