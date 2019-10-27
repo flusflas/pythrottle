@@ -79,7 +79,7 @@ def test_sync_sleep_loop():
 
 
 @pytest.mark.asyncio
-async def test_async_wait():
+async def test_async_wait_tasks():
     met = Metronome(interval=(1 / RATE))
     iter_count = TESTS_DURATION * RATE
 
