@@ -7,9 +7,10 @@ verify_ssl = true
 uvloop = "*"
 pytest-asyncio = "*"
 coverage = "*"
+pytest = "*"
+pytest-xdist = "*"
 
 [packages]
-pytest = "*"
 
 [requires]
 python_version = "3.7"
