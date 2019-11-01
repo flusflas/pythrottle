@@ -25,6 +25,13 @@ def profiler():
     yield profiler
 
 
+def assert_profiler_results(profiler: Profiler, metronome: Metronome,
+                            max_error=MAX_ERROR):
+    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
+    assert abs(profiler.error) < max_error
+    assert metronome.ticks == profiler.iter_count
+
+
 def test_interval_missing():
     met = Metronome()
     with pytest.raises(ValueError):
@@ -38,9 +45,7 @@ def test_sync_elapsed_exact(met, profiler):
             while not met.elapsed(exact=True):
                 time.sleep(sleep_time)
 
-    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(profiler.error) < MAX_ERROR
-    assert met.ticks == profiler.iter_count
+    assert_profiler_results(profiler, met)
 
 
 def test_sync_elapsed_inexact():
@@ -55,9 +60,7 @@ def test_sync_elapsed_inexact():
             while not met.elapsed(exact=False):
                 time.sleep(1 / simulated_rate)
 
-    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(profiler.error) < max_error
-    assert met.ticks == iter_count
+    assert_profiler_results(profiler, met, max_error)
 
 
 def test_sync_sleep(met, profiler):
@@ -65,9 +68,7 @@ def test_sync_sleep(met, profiler):
         for i in range(profiler.iter_count):
             met.sleep_until_available()
 
-    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(profiler.error) < MAX_ERROR
-    assert met.ticks == profiler.iter_count
+    assert_profiler_results(profiler, met)
 
 
 def test_sync_sleep_loop(met, profiler):
@@ -75,9 +76,7 @@ def test_sync_sleep_loop(met, profiler):
         for i in met.sleep_loop(max_ticks=profiler.iter_count):
             pass
 
-    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(profiler.error) < MAX_ERROR
-    assert met.ticks == profiler.iter_count
+    assert_profiler_results(profiler, met)
     assert i == profiler.iter_count
 
 
@@ -92,8 +91,7 @@ def test_restart(met, profiler):
         for i in met.sleep_loop(max_ticks=profiler.iter_count):
             pass
 
-    assert abs(profiler.error) < MAX_ERROR
-    assert met.ticks == profiler.iter_count
+    assert_profiler_results(profiler, met)
     assert i == profiler.iter_count
 
     time.sleep(1)
@@ -103,9 +101,7 @@ def test_restart(met, profiler):
         for i in met.sleep_loop(max_ticks=profiler.iter_count):
             pass
 
-    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(profiler.error) < MAX_ERROR
-    assert met.ticks == profiler.iter_count
+    assert_profiler_results(profiler, met)
     assert i == profiler.iter_count
 
 
@@ -123,8 +119,7 @@ def test_no_restart(met, profiler):
         for i in met.sleep_loop(max_ticks=profiler.iter_count):
             pass
 
-    assert abs(profiler.error) < MAX_ERROR
-    assert met.ticks == profiler.iter_count
+    assert_profiler_results(profiler, met)
     assert i == profiler.iter_count
 
     time.sleep(rest_time)
@@ -148,9 +143,7 @@ async def test_async_wait(met, profiler):
         for i in range(profiler.iter_count):
             await met.wait_until_available()
 
-    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(profiler.error) < MAX_ERROR
-    assert met.ticks == profiler.iter_count
+    assert_profiler_results(profiler, met)
 
 
 @pytest.mark.asyncio
@@ -169,9 +162,7 @@ async def test_async_wait_tasks(met, profiler):
             remaining -= size
             await asyncio.gather(*(aux_task(met) for _ in range(size)))
 
-    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(profiler.error) < MAX_ERROR
-    assert met.ticks == profiler.iter_count
+    assert_profiler_results(profiler, met)
 
 
 @pytest.mark.asyncio
@@ -180,7 +171,5 @@ async def test_async_wait_loop(met, profiler):
         async for i in met.wait_loop(max_ticks=profiler.iter_count):
             pass
 
-    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
-    assert abs(profiler.error) < MAX_ERROR
-    assert met.ticks == profiler.iter_count
+    assert_profiler_results(profiler, met)
     assert i == profiler.iter_count
