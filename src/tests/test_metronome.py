@@ -13,14 +13,18 @@ MAX_ERROR = 0.03 / 100
 TESTS_DURATION = 5
 
 
+@pytest.fixture(name="met")
+def metronome():
+    yield Metronome(interval=(1 / RATE))
+
+
 def test_interval_missing():
     met = Metronome()
     with pytest.raises(ValueError):
         met.elapsed()
 
 
-def test_sync_elapsed_exact():
-    met = Metronome(interval=(1 / RATE))
+def test_sync_elapsed_exact(met):
     iter_count = TESTS_DURATION * RATE
 
     with Profiler(iter_count, target_rate=RATE) as profiler:
@@ -51,8 +55,7 @@ def test_sync_elapsed_inexact():
     assert met.ticks == iter_count
 
 
-def test_sync_sleep():
-    met = Metronome(interval=(1 / RATE))
+def test_sync_sleep(met):
     iter_count = TESTS_DURATION * RATE
 
     with Profiler(iter_count, target_rate=RATE) as profiler:
@@ -64,8 +67,7 @@ def test_sync_sleep():
     assert met.ticks == iter_count
 
 
-def test_sync_sleep_loop():
-    met = Metronome(interval=(1 / RATE))
+def test_sync_sleep_loop(met):
     iter_count = TESTS_DURATION * RATE
 
     with Profiler(iter_count, target_rate=RATE) as profiler:
@@ -78,14 +80,13 @@ def test_sync_sleep_loop():
     assert i == iter_count
 
 
-def test_restart():
+def test_restart(met):
     """
     Tests the behavior of a single Metronome instance iterating during two
     periods of time separate separated by a short sleep. After this break,
     the Metronome is restarted to check that the behavior is the same in
     the two periods.
     """
-    met = Metronome(interval=(1 / RATE))
     iter_count = TESTS_DURATION * RATE
 
     with Profiler(iter_count, target_rate=RATE) as profiler:
@@ -109,7 +110,7 @@ def test_restart():
     assert i == iter_count
 
 
-def test_no_restart():
+def test_no_restart(met):
     """
     Tests the behavior of a single Metronome instance iterating during two
     periods of time separate separated by a short sleep. After this break,
@@ -117,7 +118,6 @@ def test_no_restart():
     be shorter as the Metronome tries to reach its internal rate, and
     therefore the metrics in this period should be different.
     """
-    met = Metronome(interval=(1 / RATE))
     iter_count = TESTS_DURATION * RATE
     rest_time = 1
 
@@ -145,8 +145,7 @@ def test_no_restart():
 
 
 @pytest.mark.asyncio
-async def test_async_wait():
-    met = Metronome(interval=(1 / RATE))
+async def test_async_wait(met):
     iter_count = TESTS_DURATION * RATE
 
     with Profiler(iter_count, target_rate=RATE) as profiler:
@@ -159,8 +158,7 @@ async def test_async_wait():
 
 
 @pytest.mark.asyncio
-async def test_async_wait_tasks():
-    met = Metronome(interval=(1 / RATE))
+async def test_async_wait_tasks(met):
     iter_count = TESTS_DURATION * RATE
 
     async def aux_task(m: Metronome):
@@ -183,8 +181,7 @@ async def test_async_wait_tasks():
 
 
 @pytest.mark.asyncio
-async def test_async_wait_loop():
-    met = Metronome(interval=(1 / RATE))
+async def test_async_wait_loop(met):
     iter_count = TESTS_DURATION * RATE
 
     with Profiler(iter_count, target_rate=RATE) as profiler:
