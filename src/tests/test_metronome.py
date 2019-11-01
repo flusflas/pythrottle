@@ -195,7 +195,7 @@ async def test_async_wait_tasks(met, profiler):
 async def test_async_wait_loop(met, profiler):
     with profiler:
         async for i in met.wait_loop(max_ticks=profiler.iter_count):
-            pass
+            i += 0      # Coverage ignores 'pass' in this async loop ¬¬
 
     assert_profiler_results(profiler, met)
     assert i == profiler.iter_count
