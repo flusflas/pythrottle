@@ -1,4 +1,5 @@
 import asyncio
+import os
 import time
 
 import pytest
@@ -13,6 +14,10 @@ MAX_ERROR = 0.03 / 100
 TESTS_DURATION = 5
 
 
+def current_test_name():
+    return os.environ.get('PYTEST_CURRENT_TEST').split(':')[-1].split(' ')[0]
+
+
 @pytest.fixture(name="met")
 def metronome():
     yield Metronome(interval=(1 / RATE))
@@ -25,9 +30,14 @@ def profiler():
     yield profiler
 
 
+def log_results(measured_rate, error):
+    test_name = current_test_name()
+    print(f"{test_name} -> (Rate: {measured_rate}, Error: {100 * error:.3f}%)")
+
+
 def assert_profiler_results(profiler: Profiler, metronome: Metronome,
                             max_error=MAX_ERROR):
-    print(f"Rate: {profiler.measured_rate}, Error: {100 * profiler.error:.3f}%")
+    log_results(measured_rate=profiler.measured_rate, error=profiler.error)
     assert abs(profiler.error) < max_error
     assert metronome.ticks == profiler.iter_count
 
@@ -130,9 +140,10 @@ def test_no_restart(met, profiler):
 
     expected_rate = profiler.iter_count / (TESTS_DURATION - rest_time)
     error = 1 - profiler.measured_rate / expected_rate
+    max_error = 0.001
 
-    print(f"Rate: {profiler.measured_rate}, Expected Rate: {expected_rate}, Error: {100 * error:.3f}%")
-    assert abs(error) < MAX_ERROR
+    log_results(measured_rate=profiler.measured_rate, error=error)
+    assert abs(error) < max_error
     assert met.ticks == 2 * profiler.iter_count
     assert i == profiler.iter_count
 
