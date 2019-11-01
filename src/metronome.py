@@ -23,11 +23,6 @@ class Metronome:
         """
         Get the interval value for timing functions and initialize the time
         reference if not set yet.
-
-        :param interval: Interval value for timing functions. If not set,
-                         default interval value will be used. If none of them
-                         are set, a ValueError will be raised.
-        :return:         Interval value.
         """
         if self.t_start is None:
             self.restart()
@@ -52,6 +47,7 @@ class Metronome:
                             deterministic and accurate intervals.
                             If False, the time reference will be updated to the
                             current time.
+                            `exact` has no effect if `auto_reset` is False.
         :return:            True if the interval has elapsed, otherwise False.
         """
         self._check()
@@ -68,7 +64,8 @@ class Metronome:
         """
         Blocks until the end of the current interval.
         Note that this function can return immediately if the next interval to
-        wait has already elapsed.
+        wait has already elapsed. This happens when reusing a
+        :class:`Metronome` instance without calling :func:`restart` first.
         """
         self._check()
         t_target = (self.t_start + self.interval)
@@ -82,7 +79,8 @@ class Metronome:
         """
         Waits asynchronously until the end of the current interval.
         Note that this function can return immediately if the next interval to
-        wait has already elapsed.
+        wait has already elapsed. This happens when reusing a
+        :class:`Metronome` instance without calling :func:`restart` first.
         """
         self._check()
         t_target = (self.t_start + self.interval)
