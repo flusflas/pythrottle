@@ -63,12 +63,6 @@ def assert_profiler_results(profiler: Profiler, metronome: Metronome,
     assert metronome.ticks == profiler.iter_count
 
 
-def test_interval_missing():
-    met = Metronome()
-    with pytest.raises(ValueError):
-        met.elapsed()
-
-
 def test_sync_elapsed_exact(met, profiler):
     with profiler:
         sleep_time = (0.01 / RATE) if (0.01 / RATE) < 0.001 else 0.001
