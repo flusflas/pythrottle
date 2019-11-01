@@ -15,16 +15,28 @@ TESTS_DURATION = 5
 
 
 def current_test_name():
+    """
+    Returns the name of the current running test.
+
+    :return: Name of the current running test.
+    """
     return os.environ.get('PYTEST_CURRENT_TEST').split(':')[-1].split(' ')[0]
 
 
 @pytest.fixture(name="met")
 def metronome():
+    """
+    Yields a :class:`Metronome` instance with the default rate.
+    """
     yield Metronome(interval=(1 / RATE))
 
 
 @pytest.fixture
 def profiler():
+    """
+    Yields a :class:`Profiler` instance with the default rate and number of
+    iterations.
+    """
     iter_count = TESTS_DURATION * RATE
     profiler = Profiler(iter_count, target_rate=RATE)
     yield profiler
@@ -37,6 +49,15 @@ def log_results(measured_rate, error):
 
 def assert_profiler_results(profiler: Profiler, metronome: Metronome,
                             max_error=MAX_ERROR):
+    """
+    Makes a series of default assertions with the :class:`Profiler` and
+    :class:`Metronome` provided.
+
+    :param profiler:  :class:`Profiler` instance with metrics of the test.
+    :param metronome: :class:`Metronome` instance after being used.
+    :param max_error: Maximum rate error to pass the test. If not provided,
+                      the default maximum error is used.
+    """
     log_results(measured_rate=profiler.measured_rate, error=profiler.error)
     assert abs(profiler.error) < max_error
     assert metronome.ticks == profiler.iter_count
