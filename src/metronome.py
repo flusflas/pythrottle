@@ -4,7 +4,20 @@ from time import perf_counter, sleep
 
 class Metronome:
     """
+    This class offers mechanisms to rate-limit the execution of some
+    iterative code.
 
+    Example:
+    >>> rate = 24   # fps
+    >>> metronome = Metronome(interval=(1 / rate))
+    >>> iters = 0
+    >>> i_start = perf_counter()
+    >>> for i in metronome.sleep_loop(24):
+    ...     # Take, process and save image
+    ...     iters += 1
+    >>> total_time = round(perf_counter() - i_start, 2)
+    >>> print('iters: {}, total_time: {}'.format(iters, total_time))
+    iters: 24, total_time: 1.0
     """
 
     def __init__(self, interval):
@@ -40,15 +53,15 @@ class Metronome:
         """
         Checks if the interval has elapsed.
 
-        :param auto_reset:  If True, the time reference will be updated if the
-                            the interval has elapsed.
-        :param exact:       If True, the time reference will be increased with
-                            the interval value, which will result in
-                            deterministic and accurate intervals.
-                            If False, the time reference will be updated to the
-                            current time.
-                            `exact` has no effect if `auto_reset` is False.
-        :return:            True if the interval has elapsed, otherwise False.
+        :param auto_reset: If True, the time reference will be updated if the
+                           the interval has elapsed.
+        :param exact:      If True, the time reference will be increased with
+                           the interval value, which will result in
+                           deterministic and accurate intervals.
+                           If False, the time reference will be updated to the
+                           current time.
+                           `exact` has no effect if `auto_reset` is False.
+        :return:           True if the interval has elapsed, otherwise False.
         """
         self._check()
         ret = (perf_counter() - self.t_start >= self.interval)
@@ -63,8 +76,8 @@ class Metronome:
     def sleep_until_available(self):
         """
         Blocks until the end of the current interval.
-        Note that this function can return immediately if the next interval to
-        wait has already elapsed. This happens when reusing a
+        Note that this function can return immediately if the next interval
+        to wait has already elapsed. This happens when reusing a
         :class:`Metronome` instance without calling :func:`restart` first.
         """
         self._check()
@@ -78,8 +91,8 @@ class Metronome:
     async def wait_until_available(self):
         """
         Waits asynchronously until the end of the current interval.
-        Note that this function can return immediately if the next interval to
-        wait has already elapsed. This happens when reusing a
+        Note that this function can return immediately if the next interval
+        to wait has already elapsed. This happens when reusing a
         :class:`Metronome` instance without calling :func:`restart` first.
         """
         self._check()
@@ -93,11 +106,11 @@ class Metronome:
         Returns a synchronous generator yielding every time an interval has
         elapsed.
 
-        :param max_ticks:   Maximum number of intervals the generator will
-                            wait for. If not set, it will run until you call
-                            break or return.
-        :return:            Yields the number of intervals elapsed since the
-                            function was called.
+        :param max_ticks: Maximum number of intervals the generator will
+                          wait for. If not set, it will run until you call
+                          break or return.
+        :return:          Yields the number of intervals elapsed since the
+                          function was called.
         """
         self._check()
         ticks = 0
@@ -112,11 +125,11 @@ class Metronome:
         Returns an asynchronous generator yielding every time an interval has
         elapsed.
 
-        :param max_ticks:   Maximum number of intervals the generator will
-                            wait for. If not set, it will run until `break`
-                            or `return` is called.
-        :return:            Yields the number of intervals elapsed since the
-                            function was called.
+        :param max_ticks: Maximum number of intervals the generator will
+                          wait for. If not set, it will run until `break`
+                          or `return` is called.
+        :return:          Yields the number of intervals elapsed since the
+                          function was called.
         """
         self._check()
         ticks = 0
