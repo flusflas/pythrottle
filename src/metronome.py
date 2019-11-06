@@ -4,10 +4,14 @@ from time import perf_counter, sleep
 
 class Metronome:
     """
-    This class offers mechanisms to rate-limit the execution of some
-    iterative code.
+    This class offers synchronous and asynchronous mechanisms to
+    accurately rate-limit the execution of some iterative code.
+    It can be used explicitly to wait between each time interval or
+    with generator functions to iterate through intervals.
 
-    Example:
+    Example: Video recorder at 24 fps. Each iteration in the loop
+    starts precisely every 1/24 seconds (if the iterations don't last
+    longer).
     >>> rate = 24   # fps
     >>> metronome = Metronome(interval=(1 / rate))
     >>> iters = 0
