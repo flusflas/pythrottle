@@ -2,7 +2,7 @@ import asyncio
 from time import perf_counter, sleep
 
 
-class Metronome:
+class Throttle:
     """
     This class offers synchronous and asynchronous mechanisms to
     accurately rate-limit the execution of some iterative code.
@@ -13,10 +13,10 @@ class Metronome:
     starts precisely every 1/24 seconds (if the iterations don't last
     longer).
     >>> rate = 24   # fps
-    >>> metronome = Metronome(interval=(1 / rate))
+    >>> throttle = Throttle(interval=(1 / rate))
     >>> iters = 0
     >>> i_start = perf_counter()
-    >>> for i in metronome.sleep_loop(24):
+    >>> for i in throttle.sleep_loop(24):
     ...     # Take, process and save image
     ...     iters += 1
     >>> total_time = round(perf_counter() - i_start, 2)
@@ -26,7 +26,7 @@ class Metronome:
 
     def __init__(self, interval):
         """
-        Returns a :class:`Metronome` instance. Time reference will be set the
+        Returns a :class:`Throttle` instance. Time reference will be set the
         first time a timing function is called.
 
         :param interval: Interval value for timing functions, in seconds.
@@ -82,7 +82,7 @@ class Metronome:
         Blocks until the end of the current interval.
         Note that this function can return immediately if the next interval
         to wait has already elapsed. This happens when reusing a
-        :class:`Metronome` instance without calling :func:`restart` first.
+        :class:`Throttle` instance without calling :func:`restart` first.
         """
         self._check()
         t_target = (self.t_start + self.interval)
@@ -97,7 +97,7 @@ class Metronome:
         Waits asynchronously until the end of the current interval.
         Note that this function can return immediately if the next interval
         to wait has already elapsed. This happens when reusing a
-        :class:`Metronome` instance without calling :func:`restart` first.
+        :class:`Throttle` instance without calling :func:`restart` first.
         """
         self._check()
         t_target = (self.t_start + self.interval)
