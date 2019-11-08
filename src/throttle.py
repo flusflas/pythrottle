@@ -1,5 +1,6 @@
 import asyncio
 import inspect
+from functools import wraps
 from time import perf_counter, sleep
 
 
@@ -173,13 +174,14 @@ def throttle(limit, interval, wait=False, on_fail=None):
 
     def decorator(func):
 
+        @wraps(func)
         def wrapper(*args, **kwargs):
             nonlocal call_counter
             call_counter += 1
 
             if throttle.elapsed():
                 call_counter = 1
-                print(f"Elapsed - ticks -> {throttle.ticks}")
+                # print(f"Elapsed - time: {perf_counter()}, interval: {interval}, ticks -> {throttle.ticks}")
             elif call_counter > limit:
                 if wait:
                     throttle.sleep_until_available()
@@ -226,6 +228,7 @@ def athrottle(limit, interval, wait=False, on_fail=None):
 
     def decorator(func):
 
+        @wraps(func)
         async def awrapper(*args, **kwargs):
             nonlocal call_counter
             call_counter += 1
