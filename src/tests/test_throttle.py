@@ -246,4 +246,4 @@ def test_sync_decorator_wait():
                 call_counter += 1
 
     assert call_counter == 25
-    assert profiler.elapsed_error(2.0) < 0.001
+    assert abs(profiler.elapsed_error(2.0)) < 0.001
