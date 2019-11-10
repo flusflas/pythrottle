@@ -199,3 +199,51 @@ async def test_async_wait_loop(throttle_fxt, profiler):
 
     assert_profiler_results(profiler, throttle_fxt)
     assert i == profiler.iter_count
+
+
+def test_sync_decorator():
+    """
+    Tests the :func:`throttle` decorator over a synchronous function
+    with `on_fail` parameter.
+    """
+    call_counter = 0
+    fail_counter = 0
+
+    def on_fail():
+        return "Error"
+
+    @throttle(limit=5, interval=1, on_fail=on_fail)
+    def foo():
+        return "OK"
+
+    for i in range(23):
+        result = foo()
+        if result == "OK":
+            call_counter += 1
+        else:
+            fail_counter += 1
+        time.sleep(0.1)
+
+    assert call_counter == 13
+    assert fail_counter == 10
+
+
+def test_sync_decorator_wait():
+    """
+    Tests the :func:`throttle` decorator over a synchronous function
+    with `wait` parameter equal to True.
+    """
+    call_counter = 0
+
+    @throttle(limit=5, interval=0.5, wait=True)
+    def foo():
+        return "OK"
+
+    with Profiler() as profiler:
+        for i in range(25):
+            result = foo()
+            if result:
+                call_counter += 1
+
+    assert call_counter == 25
+    assert profiler.elapsed_error(2.0) < 0.001

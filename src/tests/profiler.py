@@ -25,6 +25,9 @@ class Profiler:
     def error(self):
         return 1 - self.measured_rate / self.target_rate
 
+    def elapsed_error(self, target_elapsed):
+        return 1 - self.elapsed / target_elapsed
+
     def __enter__(self):
         self.t_start = time.perf_counter()
         return self
