@@ -5,7 +5,7 @@ import time
 import pytest
 import uvloop
 
-from src.throttle import Throttle, throttle
+from src.throttle import Throttle, throttle, athrottle
 from src.tests.profiler import Profiler
 
 uvloop.install()
@@ -242,6 +242,109 @@ def test_sync_decorator_wait():
     with Profiler() as profiler:
         for i in range(25):
             result = foo()
+            if result:
+                call_counter += 1
+
+    assert call_counter == 25
+    assert abs(profiler.elapsed_error(2.0)) < 0.001
+
+
+@pytest.mark.asyncio
+async def test_async_decorator_sync_error():
+    """
+    Tests the :func:`athrottle` decorator over a synchronous function
+    with a synchronous funcion as `on_fail` parameter.
+    """
+    call_counter = 0
+    fail_counter = 0
+
+    def on_fail():
+        return "Error"
+
+    @athrottle(limit=5, interval=1, on_fail=on_fail)
+    def foo():
+        return "OK"
+
+    for i in range(23):
+        result = await foo()
+        if result == "OK":
+            call_counter += 1
+        else:
+            fail_counter += 1
+        time.sleep(0.1)
+
+    assert call_counter == 13
+    assert fail_counter == 10
+
+
+@pytest.mark.asyncio
+async def test_async_decorator_async_error():
+    """
+    Tests the :func:`athrottle` decorator over an asynchronous function
+    with an asynchronous function as `on_fail` parameter.
+    """
+    call_counter = 0
+    fail_counter = 0
+
+    async def on_fail():
+        return "Error"
+
+    @athrottle(limit=5, interval=1, on_fail=on_fail)
+    async def foo():
+        return "OK"
+
+    for i in range(23):
+        result = await foo()
+        if result == "OK":
+            call_counter += 1
+        else:
+            fail_counter += 1
+        time.sleep(0.1)
+
+    assert call_counter == 13
+    assert fail_counter == 10
+
+
+@pytest.mark.asyncio
+async def test_async_decorator_value_error():
+    """
+    Tests the :func:`athrottle` decorator over an asynchronous function
+    with a non-function value as `on_fail` parameter.
+    """
+    call_counter = 0
+    fail_counter = 0
+
+    @athrottle(limit=5, interval=1, on_fail=7)
+    async def foo():
+        return "OK"
+
+    for i in range(23):
+        result = await foo()
+        if result == "OK":
+            call_counter += 1
+        elif result == 7:
+            fail_counter += 1
+        time.sleep(0.1)
+
+    assert call_counter == 13
+    assert fail_counter == 10
+
+
+@pytest.mark.asyncio
+async def test_async_decorator_wait():
+    """
+    Tests the :func:`athrottle` decorator over an asynchronous function
+    with `wait` parameter equal to True.
+    """
+    call_counter = 0
+
+    @athrottle(limit=5, interval=0.5, wait=True)
+    async def foo():
+        return "OK"
+
+    with Profiler() as profiler:
+        for i in range(25):
+            result = await foo()
             if result:
                 call_counter += 1
 
