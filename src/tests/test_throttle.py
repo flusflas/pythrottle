@@ -5,7 +5,7 @@ import time
 import pytest
 import uvloop
 
-from src.throttle import Throttle
+from src.throttle import Throttle, throttle
 from src.tests.profiler import Profiler
 
 uvloop.install()
@@ -24,7 +24,7 @@ def current_test_name():
 
 
 @pytest.fixture
-def throttle():
+def throttle_fxt():
     """
     Yields a :class:`Throttle` instance with the default rate.
     """
@@ -63,49 +63,49 @@ def assert_profiler_results(profiler: Profiler, throttle: Throttle,
     assert throttle.ticks == profiler.iter_count
 
 
-def test_sync_elapsed_exact(throttle, profiler):
+def test_sync_elapsed_exact(throttle_fxt, profiler):
     with profiler:
         sleep_time = (0.01 / RATE) if (0.01 / RATE) < 0.001 else 0.001
         for i in range(profiler.iter_count):
-            while not throttle.elapsed(exact=True):
+            while not throttle_fxt.elapsed(exact=True):
                 time.sleep(sleep_time)
 
-    assert_profiler_results(profiler, throttle)
+    assert_profiler_results(profiler, throttle_fxt)
 
 
 def test_sync_elapsed_inexact():
     rate = 5
     simulated_rate = 4
     max_error = 0.01
-    throttle = Throttle(interval=(1 / rate))
+    throttle_fxt = Throttle(interval=(1 / rate))
     iter_count = TESTS_DURATION * rate
 
     with Profiler(iter_count, target_rate=simulated_rate) as profiler:
         for i in range(iter_count):
-            while not throttle.elapsed(exact=False):
+            while not throttle_fxt.elapsed(exact=False):
                 time.sleep(1 / simulated_rate)
 
-    assert_profiler_results(profiler, throttle, max_error)
+    assert_profiler_results(profiler, throttle_fxt, max_error)
 
 
-def test_sync_sleep(throttle, profiler):
+def test_sync_sleep(throttle_fxt, profiler):
     with profiler:
         for i in range(profiler.iter_count):
-            throttle.sleep_until_available()
+            throttle_fxt.sleep_until_available()
 
-    assert_profiler_results(profiler, throttle)
+    assert_profiler_results(profiler, throttle_fxt)
 
 
-def test_sync_sleep_loop(throttle, profiler):
+def test_sync_sleep_loop(throttle_fxt, profiler):
     with profiler:
-        for i in throttle.sleep_loop(max_ticks=profiler.iter_count):
+        for i in throttle_fxt.sleep_loop(max_ticks=profiler.iter_count):
             pass
 
-    assert_profiler_results(profiler, throttle)
+    assert_profiler_results(profiler, throttle_fxt)
     assert i == profiler.iter_count
 
 
-def test_restart(throttle, profiler):
+def test_restart(throttle_fxt, profiler):
     """
     Tests the behavior of a single Throttle instance iterating during two
     periods of time separate separated by a short sleep. After this break,
@@ -113,24 +113,24 @@ def test_restart(throttle, profiler):
     the two periods.
     """
     with profiler:
-        for i in throttle.sleep_loop(max_ticks=profiler.iter_count):
+        for i in throttle_fxt.sleep_loop(max_ticks=profiler.iter_count):
             pass
 
-    assert_profiler_results(profiler, throttle)
+    assert_profiler_results(profiler, throttle_fxt)
     assert i == profiler.iter_count
 
     time.sleep(1)
-    throttle.restart()
+    throttle_fxt.restart()
 
     with profiler:
-        for i in throttle.sleep_loop(max_ticks=profiler.iter_count):
+        for i in throttle_fxt.sleep_loop(max_ticks=profiler.iter_count):
             pass
 
-    assert_profiler_results(profiler, throttle)
+    assert_profiler_results(profiler, throttle_fxt)
     assert i == profiler.iter_count
 
 
-def test_no_restart(throttle, profiler):
+def test_no_restart(throttle_fxt, profiler):
     """
     Tests the behavior of a single Throttle instance iterating during two
     periods of time separate separated by a short sleep. After this break,
@@ -141,16 +141,16 @@ def test_no_restart(throttle, profiler):
     rest_time = 1
 
     with profiler:
-        for i in throttle.sleep_loop(max_ticks=profiler.iter_count):
+        for i in throttle_fxt.sleep_loop(max_ticks=profiler.iter_count):
             pass
 
-    assert_profiler_results(profiler, throttle)
+    assert_profiler_results(profiler, throttle_fxt)
     assert i == profiler.iter_count
 
     time.sleep(rest_time)
 
     with profiler:
-        for i in throttle.sleep_loop(max_ticks=profiler.iter_count):
+        for i in throttle_fxt.sleep_loop(max_ticks=profiler.iter_count):
             pass
 
     expected_rate = profiler.iter_count / (TESTS_DURATION - rest_time)
@@ -159,21 +159,21 @@ def test_no_restart(throttle, profiler):
 
     log_results(measured_rate=profiler.measured_rate, error=error)
     assert abs(error) < max_error
-    assert throttle.ticks == 2 * profiler.iter_count
+    assert throttle_fxt.ticks == 2 * profiler.iter_count
     assert i == profiler.iter_count
 
 
 @pytest.mark.asyncio
-async def test_async_wait(throttle, profiler):
+async def test_async_wait(throttle_fxt, profiler):
     with profiler:
         for i in range(profiler.iter_count):
-            await throttle.wait_until_available()
+            await throttle_fxt.wait_until_available()
 
-    assert_profiler_results(profiler, throttle)
+    assert_profiler_results(profiler, throttle_fxt)
 
 
 @pytest.mark.asyncio
-async def test_async_wait_tasks(throttle, profiler):
+async def test_async_wait_tasks(throttle_fxt, profiler):
     async def aux_task(m: Throttle):
         await m.wait_until_available()
 
@@ -186,16 +186,16 @@ async def test_async_wait_tasks(throttle, profiler):
         while remaining > 0:
             size = remaining if remaining < max_tasks else max_tasks
             remaining -= size
-            await asyncio.gather(*(aux_task(throttle) for _ in range(size)))
+            await asyncio.gather(*(aux_task(throttle_fxt) for _ in range(size)))
 
-    assert_profiler_results(profiler, throttle)
+    assert_profiler_results(profiler, throttle_fxt)
 
 
 @pytest.mark.asyncio
-async def test_async_wait_loop(throttle, profiler):
+async def test_async_wait_loop(throttle_fxt, profiler):
     with profiler:
-        async for i in throttle.wait_loop(max_ticks=profiler.iter_count):
+        async for i in throttle_fxt.wait_loop(max_ticks=profiler.iter_count):
             i += 0      # Coverage ignores 'pass' in this async loop ¬¬
 
-    assert_profiler_results(profiler, throttle)
+    assert_profiler_results(profiler, throttle_fxt)
     assert i == profiler.iter_count
