@@ -54,7 +54,7 @@ def assert_profiler_results(profiler: Profiler, throttle: Throttle,
     :class:`Throttle` provided.
 
     :param profiler:  :class:`Profiler` instance with metrics of the test.
-    :param throttle: :class:`Throttle` instance after being used.
+    :param throttle:  :class:`Throttle` instance after being used.
     :param max_error: Maximum rate error to pass the test. If not provided,
                       the default maximum error is used.
     """
@@ -64,6 +64,10 @@ def assert_profiler_results(profiler: Profiler, throttle: Throttle,
 
 
 def test_sync_elapsed_exact(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using :func:`Throttle.elapsed`
+    to wait between intervals with `exact` parameter equals to True.
+    """
     with profiler:
         sleep_time = (0.01 / RATE) if (0.01 / RATE) < 0.001 else 0.001
         for i in range(profiler.iter_count):
@@ -74,6 +78,10 @@ def test_sync_elapsed_exact(throttle_fxt, profiler):
 
 
 def test_sync_elapsed_inexact():
+    """
+    Tests the behavior of a Throttle instance using :func:`Throttle.elapsed`
+    to wait between intervals with `exact` parameter equals to False.
+    """
     rate = 5
     simulated_rate = 4
     max_error = 0.01
@@ -89,6 +97,10 @@ def test_sync_elapsed_inexact():
 
 
 def test_sync_sleep(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using
+    :func:`Throttle.sleep_until_available` to wait between intervals.
+    """
     with profiler:
         for i in range(profiler.iter_count):
             throttle_fxt.sleep_until_available()
@@ -97,6 +109,10 @@ def test_sync_sleep(throttle_fxt, profiler):
 
 
 def test_sync_sleep_loop(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using
+    :func:`Throttle.sleep_loop` to iterate between intervals.
+    """
     with profiler:
         for i in throttle_fxt.sleep_loop(max_ticks=profiler.iter_count):
             pass
@@ -165,6 +181,10 @@ def test_no_restart(throttle_fxt, profiler):
 
 @pytest.mark.asyncio
 async def test_async_wait(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using
+    :func:`Throttle.wait_until_available` to wait between intervals.
+    """
     with profiler:
         for i in range(profiler.iter_count):
             await throttle_fxt.wait_until_available()
@@ -174,6 +194,11 @@ async def test_async_wait(throttle_fxt, profiler):
 
 @pytest.mark.asyncio
 async def test_async_wait_tasks(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using
+    :func:`Throttle.wait_until_available` to wait between intervals.
+    For each interval, an asynchronous task is created.
+    """
     async def aux_task(m: Throttle):
         await m.wait_until_available()
 
@@ -193,6 +218,10 @@ async def test_async_wait_tasks(throttle_fxt, profiler):
 
 @pytest.mark.asyncio
 async def test_async_wait_loop(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using
+    :func:`Throttle.wait_loop` to iterate between intervals.
+    """
     with profiler:
         async for i in throttle_fxt.wait_loop(max_ticks=profiler.iter_count):
             i += 0      # Coverage ignores 'pass' in this async loop ¬¬
