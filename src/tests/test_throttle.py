@@ -11,7 +11,7 @@ from src.tests.profiler import Profiler
 uvloop.install()
 RATE = 10000
 MAX_ERROR = 0.03 / 100
-TESTS_DURATION = 5
+TESTS_DURATION = 10
 
 
 def current_test_name():
