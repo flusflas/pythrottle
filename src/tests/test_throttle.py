@@ -379,3 +379,60 @@ async def test_async_decorator_wait():
 
     assert call_counter == 25
     assert abs(profiler.elapsed_error(2.0)) < 0.001
+
+
+def test_nested_sync_decorators():
+    """
+    Tests nesting of two :func:`throttle` decorators to set two call
+    limits for a single synchronous function.
+    """
+    call_counter = 0
+    fail_counter_1 = 0
+    fail_counter_2 = 0
+
+    @throttle(limit=2, interval=0.1, on_fail="FAIL_1")
+    @throttle(limit=3, interval=0.2, on_fail="FAIL_2")
+    def foo():
+        return "OK"
+
+    for _ in Throttle(interval=0.01).sleep_loop(100):
+        result = foo()
+        if result == "OK":
+            call_counter += 1
+        elif result == "FAIL_1":
+            fail_counter_1 += 1
+        elif result == "FAIL_2":
+            fail_counter_2 += 1
+
+    assert call_counter == 15
+    assert fail_counter_1 == 80
+    assert fail_counter_2 == 5
+
+
+@pytest.mark.asyncio
+async def test_nested_async_decorators():
+    """
+    Tests nesting of two :func:`athrottle` decorators to set two call
+    limits for a single asynchronous function.
+    """
+    call_counter = 0
+    fail_counter_1 = 0
+    fail_counter_2 = 0
+
+    @athrottle(limit=2, interval=0.1, on_fail="FAIL_1")
+    @athrottle(limit=3, interval=0.2, on_fail="FAIL_2")
+    async def foo():
+        return "OK"
+
+    async for _ in Throttle(interval=0.01).wait_loop(100):
+        result = await foo()
+        if result == "OK":
+            call_counter += 1
+        elif result == "FAIL_1":
+            fail_counter_1 += 1
+        elif result == "FAIL_2":
+            fail_counter_2 += 1
+
+    assert call_counter == 15
+    assert fail_counter_1 == 80
+    assert fail_counter_2 == 5
