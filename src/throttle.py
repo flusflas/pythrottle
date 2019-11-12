@@ -1,4 +1,6 @@
 import asyncio
+import inspect
+from functools import wraps
 from time import perf_counter, sleep
 
 
@@ -142,3 +144,112 @@ class Throttle:
                 ticks += 1
             await self.wait_until_available()
             yield ticks
+
+
+def throttle(limit, interval, wait=False, on_fail=None):
+    """
+    Decorator to limit the number of calls to a synchronous function in
+    an interval of time. It ensures that the decorated function is not
+    called more than `limit` times in the same time interval.
+    If limit is reached, it can return a custom result or sleep until
+    the next time interval.
+    Do not use this function to decorate an asynchronous function (use
+    :func:`athrottle` instead).
+
+    :param limit:    Maximum number of calls allowed to the decorated
+                     function in each time interval.
+    :param interval: Seconds of every time period.
+    :param wait:     If True, it will block when limit is reached until
+                     the next interval, and then it will call the function.
+    :param on_fail:  Value, object or function to return if the call
+                     limit is reached. If `on_fail` is a function, the
+                     decorator will return the result of the call to
+                     this function. Note that `on_fail` only makes sense
+                     if `wait` is False.
+    :return:         Result of the call to the decorated function, or
+                     `on_fail` if limit is reached (and `wait` is False).
+    """
+    call_counter = 0
+    throttle_ = Throttle(interval)
+
+    def decorator(func):
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            nonlocal call_counter
+            call_counter += 1
+
+            if throttle_.elapsed():
+                call_counter = 1
+            elif call_counter > limit:
+                if wait:
+                    throttle_.sleep_until_available()
+                    call_counter = 1
+                else:
+                    return on_fail() if callable(on_fail) else on_fail
+
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def athrottle(limit, interval, wait=False, on_fail=None):
+    """
+    Decorator to limit the number of calls to a synchronous or
+    asynchronous function in an interval of time. It ensures that the
+    decorated function is not called more than `limit` times in the
+    same time interval.
+    If limit is reached, it can return a custom result or sleep until
+    the next time interval.
+    Do not use this function to decorate a synchronous function (use
+    :func:`throttle` instead).
+
+    :param limit:    Maximum number of calls allowed to the decorated
+                     function in each time interval.
+    :param interval: Seconds of every time period.
+    :param wait:     If True, it will asynchronously wait when limit is
+                     reached until the next interval, and then it will
+                     call the function.
+    :param on_fail:  Value, object or function to return if the call
+                     limit is reached. If `on_fail` is a function, the
+                     decorator will return the result of the call to
+                     this function (if this function is asynchronous,
+                     it will await for its result). Note that `on_fail`
+                     only makes sense if `wait` is False.
+    :return:         Result of the call to the decorated function, or
+                     `on_fail` if limit is reached (and `wait` is False).
+    """
+    call_counter = 0
+    throttle_ = Throttle(interval)
+
+    def decorator(func):
+
+        @wraps(func)
+        async def awrapper(*args, **kwargs):
+            nonlocal call_counter
+            call_counter += 1
+
+            if throttle_.elapsed():
+                call_counter = 1
+            elif call_counter > limit:
+                if wait:
+                    await throttle_.wait_until_available()
+                    call_counter = 1
+                else:
+                    if inspect.iscoroutinefunction(on_fail):
+                        return await on_fail()
+                    elif inspect.isfunction(on_fail):
+                        return on_fail()
+                    else:
+                        return on_fail
+
+            if inspect.iscoroutinefunction(func):
+                return await func(*args, **kwargs)
+            else:
+                return func(*args, **kwargs)
+
+        return awrapper
+
+    return decorator
