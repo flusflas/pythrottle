@@ -181,12 +181,10 @@ def throttle(limit, interval, wait=False, on_fail=None):
 
             if throttle.elapsed():
                 call_counter = 1
-                # print(f"Elapsed - time: {perf_counter()}, interval: {interval}, ticks -> {throttle.ticks}")
             elif call_counter > limit:
                 if wait:
                     throttle.sleep_until_available()
                     call_counter = 1
-                    print(f"Sleep - ticks -> {throttle.ticks}")
                 else:
                     return on_fail() if callable(on_fail) else on_fail
 
@@ -235,12 +233,10 @@ def athrottle(limit, interval, wait=False, on_fail=None):
 
             if throttle.elapsed():
                 call_counter = 1
-                print(f"Elapsed - interval: {interval}, ticks -> {throttle.ticks}")
             elif call_counter > limit:
                 if wait:
                     await throttle.wait_until_available()
                     call_counter = 1
-                    print(f"Await - ticks -> {throttle.ticks}")
                 else:
                     if inspect.iscoroutinefunction(on_fail):
                         return await on_fail()
