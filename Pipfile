@@ -9,6 +9,8 @@ pytest-asyncio = "*"
 coverage = "*"
 pytest = "*"
 pytest-xdist = "*"
+radon = "*"
+pytest-cov = "*"
 
 [packages]
 
