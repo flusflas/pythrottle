@@ -146,7 +146,7 @@ class Throttle:
             yield ticks
 
 
-def throttle(limit, interval, wait=False, on_fail=None):
+def throttle(limit=1, interval=1.0, wait=False, on_fail=None):
     """
     Decorator to limit the number of calls to a synchronous function in
     an interval of time. It ensures that the decorated function is not
@@ -195,7 +195,7 @@ def throttle(limit, interval, wait=False, on_fail=None):
     return decorator
 
 
-def athrottle(limit, interval, wait=False, on_fail=None):
+def athrottle(limit=1, interval=1.0, wait=False, on_fail=None):
     """
     Decorator to limit the number of calls to a synchronous or
     asynchronous function in an interval of time. It ensures that the
