@@ -11,6 +11,6 @@ stages:
 test:
   stage: test
   script:
-  - pipenv run pytest --cov=./ -n 17
+  - pipenv run pytest --cov=./
   - pipenv run coverage report -m
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
