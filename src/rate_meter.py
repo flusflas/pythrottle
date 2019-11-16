@@ -22,7 +22,7 @@ class RateMeter:
         if self._times.count(first_time_value) == 0:
             first_time_index -= 1
 
-        for i in range(first_time_index):
+        for _ in range(first_time_index):
             self._times.popleft()
             self._values.popleft()
 
@@ -38,7 +38,4 @@ class RateMeter:
 
         value_diff = self._values[-1] - self._values[0]
         time_diff = self._times[-1] - self._times[0]
-        if time_diff == 0:
-            return 0
-
-        return value_diff / time_diff
+        return 0 if time_diff == 0 else value_diff / time_diff
