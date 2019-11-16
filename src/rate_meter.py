@@ -26,7 +26,9 @@ class RateMeter:
             self._times.popleft()
             self._values.popleft()
 
-    def update(self, value):
+    def update(self, value=None):
+        if value is None:
+            value = self._values[-1] + 1 if len(self._values) > 0 else 0
         t_current = perf_counter()
         self._times.append(t_current)
         self._values.append(value)
