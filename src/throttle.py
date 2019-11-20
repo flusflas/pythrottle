@@ -14,14 +14,15 @@ class Throttle:
     Example: Video recorder at 24 fps. Each iteration in the loop
     starts precisely every 1/24 seconds (if the iterations don't last
     longer).
+
     >>> rate = 24   # fps
     >>> throttle = Throttle(interval=(1 / rate))
     >>> iters = 0
-    >>> i_start = perf_counter()
+    >>> t_start = perf_counter()
     >>> for i in throttle.sleep_loop(24):
     ...     # Take, process and save image
     ...     iters += 1
-    >>> total_time = round(perf_counter() - i_start, 2)
+    >>> total_time = round(perf_counter() - t_start, 2)
     >>> print('iters: {}, total_time: {}'.format(iters, total_time))
     iters: 24, total_time: 1.0
     """
