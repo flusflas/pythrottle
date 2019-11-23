@@ -108,6 +108,22 @@ def test_sync_wait_next(throttle_fxt, profiler):
     assert_profiler_results(profiler, throttle_fxt)
 
 
+def test_sync_loop_no_arguments(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using :func:`Throttle.loop`
+    to iterate between intervals without arguments.
+    """
+    ticks = -1
+    with profiler:
+        for i in throttle_fxt.loop():
+            ticks += 1
+            assert ticks == i
+            if ticks == profiler.iter_count - 1:
+                break
+
+    assert_profiler_results(profiler, throttle_fxt)
+
+
 def test_sync_loop_max_ticks(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
@@ -251,6 +267,23 @@ async def test_async_await_next_tasks(throttle_fxt, profiler):
             size = remaining if remaining < max_tasks else max_tasks
             remaining -= size
             await asyncio.gather(*(aux_task(throttle_fxt) for _ in range(size)))
+
+    assert_profiler_results(profiler, throttle_fxt)
+
+
+@pytest.mark.asyncio
+async def test_sync_aloop_no_arguments(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using :func:`Throttle.aloop`
+    to iterate between intervals without arguments.
+    """
+    ticks = -1
+    with profiler:
+        async for i in throttle_fxt.aloop():
+            ticks += 1
+            assert ticks == i
+            if ticks == profiler.iter_count - 1:
+                break
 
     assert_profiler_results(profiler, throttle_fxt)
 
