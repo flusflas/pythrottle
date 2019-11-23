@@ -96,7 +96,7 @@ def test_sync_elapsed_inexact():
     assert_profiler_results(profiler, throttle_fxt, max_error)
 
 
-def test_sync_sleep(throttle_fxt, profiler):
+def test_sync_wait_next(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.wait_next` to wait between intervals.
@@ -219,7 +219,7 @@ def test_no_restart(throttle_fxt, profiler):
 
 
 @pytest.mark.asyncio
-async def test_async_wait(throttle_fxt, profiler):
+async def test_async_await_next(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.await_next` to wait between intervals.
@@ -232,7 +232,7 @@ async def test_async_wait(throttle_fxt, profiler):
 
 
 @pytest.mark.asyncio
-async def test_async_wait_tasks(throttle_fxt, profiler):
+async def test_async_await_next_tasks(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.await_next` to wait between intervals.
