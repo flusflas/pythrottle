@@ -24,8 +24,8 @@ Getting started
 ===============
 
 A basic use for throttling the execution of a code block is using
-:func:`Throttle.sleep_loop() <throttle.Throttle.sleep_loop>`
-(or :func:`Throttle.wait_loop() <throttle.Throttle.wait_loop>` for
+:func:`Throttle.loop() <throttle.Throttle.loop>`
+(or :func:`Throttle.aloop() <throttle.Throttle.aloop>` for
 asynchronous mode). This will allow execution of the code every ``1 / rate``
 seconds:
 
@@ -36,7 +36,7 @@ seconds:
     rate = 24.0     # Target rate
     t = Throttle(interval=(1 / rate))
 
-    for i in t.sleep_loop():
+    for i in t.loop():
         # Do something
         print(f"Iteration {i}")
 
@@ -56,7 +56,7 @@ accurate frame rate of 24 fps using OpenCV.
 
     t = Throttle(interval=(1 / rate))
 
-    for _ in t.sleep_loop():
+    for _ in t.loop():
         ret, frame = cap.read()    # Frame capture
         out.write(frame)           # Save frame to output file
 

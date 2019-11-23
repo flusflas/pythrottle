@@ -184,7 +184,7 @@ def throttle(limit=1, interval=1.0, wait=False, on_fail=None):
     If limit is reached, it can return a custom result or sleep until
     the next time interval.
     Do not use this function to decorate an asynchronous function (use
-    :func:`athrottle` instead).
+    :func:`~throttle.athrottle` instead).
 
     :param limit:    Maximum number of calls allowed to the decorated
                      function in each time interval.
@@ -234,7 +234,7 @@ def athrottle(limit=1, interval=1.0, wait=False, on_fail=None):
     If limit is reached, it can return a custom result or sleep until
     the next time interval.
     Do not use this function to decorate a synchronous function (use
-    :func:`throttle` instead).
+    :func:`~throttle.throttle` instead).
 
     :param limit:    Maximum number of calls allowed to the decorated
                      function in each time interval.
