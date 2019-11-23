@@ -1,5 +1,6 @@
 import asyncio
 import inspect
+import math
 from functools import wraps
 from time import perf_counter, sleep
 
@@ -107,38 +108,66 @@ class Throttle:
         await asyncio.sleep(t_target - perf_counter())
         self.ticks += 1
 
-    def sleep_loop(self, max_ticks=None):
+    def sleep_loop(self, max_ticks=None, duration=None):
         """
         Returns a synchronous generator yielding every time an interval has
         elapsed.
 
+        You can specify a maximum number of iterations or a maximum duration
+        for the generator, but not both. If none is set, the generator will
+        run until you call break, return or raise an exception.
+
         :param max_ticks: Maximum number of intervals the generator will
-                          wait for. If not set, it will run until you call
-                          break or return.
+                          wait for.
+        :param duration:  Seconds of loop duration. The generator will loop
+                          for ``ceil(duration / self.interval)`` iterations,
+                          so the elapsed time may be longer than `duration`,
+                          but never shorter.
         :return:          Yields the number of intervals elapsed since the
                           function was called.
         """
+        if max_ticks is not None and duration is not None:
+            raise ValueError("max_ticks and duration cannot be set at"
+                             "the same time")
         self._check()
         ticks = 0
+
+        if duration is not None:
+            max_ticks = math.ceil(duration / self.interval)
+
         while max_ticks is None or ticks < max_ticks:
             if max_ticks:
                 ticks += 1
             self.sleep_until_available()
             yield ticks
 
-    async def wait_loop(self, max_ticks=None):
+    async def wait_loop(self, max_ticks=None, duration=None):
         """
         Returns an asynchronous generator yielding every time an interval has
         elapsed.
 
+        You can specify a maximum number of iterations or a maximum duration
+        for the generator, but not both. If none is set, the generator will
+        run until you call break, return or raise an exception.
+
         :param max_ticks: Maximum number of intervals the generator will
-                          wait for. If not set, it will run until `break`
-                          or `return` is called.
+                          wait for.
+        :param duration:  Seconds of loop duration. The generator will loop
+                          for ``ceil(duration / self.interval)`` iterations,
+                          so the elapsed time may be longer than `duration`,
+                          but never shorter.
         :return:          Yields the number of intervals elapsed since the
                           function was called.
         """
+        if max_ticks is not None and duration is not None:
+            raise ValueError("max_ticks and duration cannot be set at"
+                             "the same time")
         self._check()
         ticks = 0
+
+        if duration is not None:
+            max_ticks = math.ceil(duration / self.interval)
+
         while max_ticks is None or ticks < max_ticks:
             if max_ticks:
                 ticks += 1
