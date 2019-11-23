@@ -136,10 +136,9 @@ class Throttle:
             max_ticks = math.ceil(duration / self.interval)
 
         while max_ticks is None or ticks < max_ticks:
-            if max_ticks:
-                ticks += 1
             self.wait_next()
             yield ticks
+            ticks += 1
 
     async def aloop(self, max_ticks=None, duration=None):
         """
@@ -169,10 +168,9 @@ class Throttle:
             max_ticks = math.ceil(duration / self.interval)
 
         while max_ticks is None or ticks < max_ticks:
-            if max_ticks:
-                ticks += 1
             await self.await_next()
             yield ticks
+            ticks += 1
 
 
 def throttle(limit=1, interval=1.0, wait=False, on_fail=None):
