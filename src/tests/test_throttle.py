@@ -99,26 +99,53 @@ def test_sync_elapsed_inexact():
 def test_sync_sleep(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
-    :func:`Throttle.sleep_until_available` to wait between intervals.
+    :func:`Throttle.wait_next` to wait between intervals.
     """
     with profiler:
         for i in range(profiler.iter_count):
-            throttle_fxt.sleep_until_available()
+            throttle_fxt.wait_next()
 
     assert_profiler_results(profiler, throttle_fxt)
 
 
-def test_sync_sleep_loop(throttle_fxt, profiler):
+def test_sync_loop_max_ticks(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
-    :func:`Throttle.sleep_loop` to iterate between intervals.
+    :func:`Throttle.loop` to iterate between intervals for a
+    maximum number of iterations.
     """
     with profiler:
-        for i in throttle_fxt.sleep_loop(max_ticks=profiler.iter_count):
+        for i in throttle_fxt.loop(max_ticks=profiler.iter_count):
             pass
 
     assert_profiler_results(profiler, throttle_fxt)
     assert i == profiler.iter_count
+
+
+def test_sync_loop_duration(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using
+    :func:`Throttle.loop` to iterate between intervals for a
+    maximum amount of time.
+    """
+    with profiler:
+        for i in throttle_fxt.loop(duration=TESTS_DURATION):
+            pass
+
+    assert_profiler_results(profiler, throttle_fxt)
+    assert i == profiler.iter_count
+
+
+def test_sync_loop_invalid_params(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using
+    :func:`Throttle.loop` with invalid parameters.
+    """
+    with pytest.raises(ValueError):
+        with profiler:
+            gen = throttle_fxt.loop(max_ticks=profiler.iter_count,
+                                    duration=TESTS_DURATION)
+            next(gen)
 
 
 def test_restart(throttle_fxt, profiler):
@@ -129,7 +156,7 @@ def test_restart(throttle_fxt, profiler):
     the two periods.
     """
     with profiler:
-        for i in throttle_fxt.sleep_loop(max_ticks=profiler.iter_count):
+        for i in throttle_fxt.loop(max_ticks=profiler.iter_count):
             pass
 
     assert_profiler_results(profiler, throttle_fxt)
@@ -139,7 +166,7 @@ def test_restart(throttle_fxt, profiler):
     throttle_fxt.restart()
 
     with profiler:
-        for i in throttle_fxt.sleep_loop(max_ticks=profiler.iter_count):
+        for i in throttle_fxt.loop(max_ticks=profiler.iter_count):
             pass
 
     assert_profiler_results(profiler, throttle_fxt)
@@ -157,7 +184,7 @@ def test_no_restart(throttle_fxt, profiler):
     rest_time = 1
 
     with profiler:
-        for i in throttle_fxt.sleep_loop(max_ticks=profiler.iter_count):
+        for i in throttle_fxt.loop(max_ticks=profiler.iter_count):
             pass
 
     assert_profiler_results(profiler, throttle_fxt)
@@ -166,7 +193,7 @@ def test_no_restart(throttle_fxt, profiler):
     time.sleep(rest_time)
 
     with profiler:
-        for i in throttle_fxt.sleep_loop(max_ticks=profiler.iter_count):
+        for i in throttle_fxt.loop(max_ticks=profiler.iter_count):
             pass
 
     expected_rate = profiler.iter_count / (TESTS_DURATION - rest_time)
@@ -183,11 +210,11 @@ def test_no_restart(throttle_fxt, profiler):
 async def test_async_wait(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
-    :func:`Throttle.wait_until_available` to wait between intervals.
+    :func:`Throttle.await_next` to wait between intervals.
     """
     with profiler:
         for i in range(profiler.iter_count):
-            await throttle_fxt.wait_until_available()
+            await throttle_fxt.await_next()
 
     assert_profiler_results(profiler, throttle_fxt)
 
@@ -196,11 +223,11 @@ async def test_async_wait(throttle_fxt, profiler):
 async def test_async_wait_tasks(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
-    :func:`Throttle.wait_until_available` to wait between intervals.
+    :func:`Throttle.await_next` to wait between intervals.
     For each interval, an asynchronous task is created.
     """
     async def aux_task(m: Throttle):
-        await m.wait_until_available()
+        await m.await_next()
 
     # Split async tasks in chunks to avoid large number of tasks in the loop
     # (which reduce performace for high rates and distorts the test)
@@ -217,17 +244,46 @@ async def test_async_wait_tasks(throttle_fxt, profiler):
 
 
 @pytest.mark.asyncio
-async def test_async_wait_loop(throttle_fxt, profiler):
+async def test_async_aloop_max_ticks(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
-    :func:`Throttle.wait_loop` to iterate between intervals.
+    :func:`Throttle.aloop` to iterate between intervals for a
+    maximum number of iterations.
     """
     with profiler:
-        async for i in throttle_fxt.wait_loop(max_ticks=profiler.iter_count):
+        async for i in throttle_fxt.aloop(max_ticks=profiler.iter_count):
             i += 0      # Coverage ignores 'pass' in this async loop ¬¬
 
     assert_profiler_results(profiler, throttle_fxt)
     assert i == profiler.iter_count
+
+
+@pytest.mark.asyncio
+async def test_async_aloop_duration(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using
+    :func:`Throttle.aloop` to iterate between intervals for a
+    maximum amount of time.
+    """
+    with profiler:
+        async for i in throttle_fxt.aloop(duration=TESTS_DURATION):
+            i += 0      # Coverage ignores 'pass' in this async loop ¬¬
+
+    assert_profiler_results(profiler, throttle_fxt)
+    assert i == profiler.iter_count
+
+
+@pytest.mark.asyncio
+async def test_async_loop_invalid_params(throttle_fxt, profiler):
+    """
+    Tests the behavior of a Throttle instance using
+    :func:`Throttle.aloop` with invalid parameters.
+    """
+    with pytest.raises(ValueError):
+        with profiler:
+            gen = throttle_fxt.aloop(max_ticks=profiler.iter_count,
+                                     duration=TESTS_DURATION)
+            await gen.__anext__()
 
 
 def test_sync_decorator():
@@ -395,7 +451,7 @@ def test_nested_sync_decorators():
     def foo():
         return "OK"
 
-    for _ in Throttle(interval=0.01).sleep_loop(100):
+    for _ in Throttle(interval=0.01).loop(100):
         result = foo()
         if result == "OK":
             call_counter += 1
@@ -424,7 +480,7 @@ async def test_nested_async_decorators():
     async def foo():
         return "OK"
 
-    async for _ in Throttle(interval=0.01).wait_loop(100):
+    async for _ in Throttle(interval=0.01).aloop(100):
         result = await foo()
         if result == "OK":
             call_counter += 1
