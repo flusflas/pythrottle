@@ -40,7 +40,7 @@ def test_ratemeter_non_consecutive_update(throttle, rate_meter):
 
     assert rate_meter.rate() == 0
 
-    for i in throttle.sleep_loop(iters):
+    for i in throttle.loop(iters):
         if i % 5 == 0:
             rate_meter.update(i)
         measured_rate = rate_meter.rate()
@@ -60,7 +60,7 @@ def test_ratemeter_default_update_param(throttle, rate_meter):
 
     assert rate_meter.rate() == 0
 
-    for i in throttle.sleep_loop(iters):
+    for i in throttle.loop(iters):
         rate_meter.update()
         measured_rate = rate_meter.rate()
         if i > measured_rate != 0:

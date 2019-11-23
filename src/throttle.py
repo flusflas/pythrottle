@@ -19,7 +19,7 @@ class Throttle:
     >>> throttle = Throttle(interval=(1 / rate))
     >>> iters = 0
     >>> i_start = perf_counter()
-    >>> for i in throttle.sleep_loop(24):
+    >>> for i in throttle.loop(24):
     ...     # Take, process and save image
     ...     iters += 1
     >>> total_time = round(perf_counter() - i_start, 2)
@@ -108,7 +108,7 @@ class Throttle:
         await asyncio.sleep(t_target - perf_counter())
         self.ticks += 1
 
-    def sleep_loop(self, max_ticks=None, duration=None):
+    def loop(self, max_ticks=None, duration=None):
         """
         Returns a synchronous generator yielding every time an interval has
         elapsed.
@@ -141,7 +141,7 @@ class Throttle:
             self.sleep_until_available()
             yield ticks
 
-    async def wait_loop(self, max_ticks=None, duration=None):
+    async def aloop(self, max_ticks=None, duration=None):
         """
         Returns an asynchronous generator yielding every time an interval has
         elapsed.
