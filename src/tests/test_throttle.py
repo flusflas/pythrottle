@@ -99,11 +99,11 @@ def test_sync_elapsed_inexact():
 def test_sync_sleep(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
-    :func:`Throttle.sleep_until_available` to wait between intervals.
+    :func:`Throttle.wait_next` to wait between intervals.
     """
     with profiler:
         for i in range(profiler.iter_count):
-            throttle_fxt.sleep_until_available()
+            throttle_fxt.wait_next()
 
     assert_profiler_results(profiler, throttle_fxt)
 
@@ -210,11 +210,11 @@ def test_no_restart(throttle_fxt, profiler):
 async def test_async_wait(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
-    :func:`Throttle.wait_until_available` to wait between intervals.
+    :func:`Throttle.await_next` to wait between intervals.
     """
     with profiler:
         for i in range(profiler.iter_count):
-            await throttle_fxt.wait_until_available()
+            await throttle_fxt.await_next()
 
     assert_profiler_results(profiler, throttle_fxt)
 
@@ -223,11 +223,11 @@ async def test_async_wait(throttle_fxt, profiler):
 async def test_async_wait_tasks(throttle_fxt, profiler):
     """
     Tests the behavior of a Throttle instance using
-    :func:`Throttle.wait_until_available` to wait between intervals.
+    :func:`Throttle.await_next` to wait between intervals.
     For each interval, an asynchronous task is created.
     """
     async def aux_task(m: Throttle):
-        await m.wait_until_available()
+        await m.await_next()
 
     # Split async tasks in chunks to avoid large number of tasks in the loop
     # (which reduce performace for high rates and distorts the test)

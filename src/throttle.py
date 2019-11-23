@@ -80,7 +80,7 @@ class Throttle:
                 self.t_start = perf_counter()
         return ret
 
-    def sleep_until_available(self):
+    def wait_next(self):
         """
         Blocks until the end of the current interval.
         Note that this function can return immediately if the next interval
@@ -95,7 +95,7 @@ class Throttle:
             sleep(sleep_time)
         self.ticks += 1
 
-    async def wait_until_available(self):
+    async def await_next(self):
         """
         Waits asynchronously until the end of the current interval.
         Note that this function can return immediately if the next interval
@@ -138,7 +138,7 @@ class Throttle:
         while max_ticks is None or ticks < max_ticks:
             if max_ticks:
                 ticks += 1
-            self.sleep_until_available()
+            self.wait_next()
             yield ticks
 
     async def aloop(self, max_ticks=None, duration=None):
@@ -171,7 +171,7 @@ class Throttle:
         while max_ticks is None or ticks < max_ticks:
             if max_ticks:
                 ticks += 1
-            await self.wait_until_available()
+            await self.await_next()
             yield ticks
 
 
@@ -212,7 +212,7 @@ def throttle(limit=1, interval=1.0, wait=False, on_fail=None):
                 call_counter = 1
             elif call_counter > limit:
                 if wait:
-                    throttle_.sleep_until_available()
+                    throttle_.wait_next()
                     call_counter = 1
                 else:
                     return on_fail() if callable(on_fail) else on_fail
@@ -264,7 +264,7 @@ def athrottle(limit=1, interval=1.0, wait=False, on_fail=None):
                 call_counter = 1
             elif call_counter > limit:
                 if wait:
-                    await throttle_.wait_until_available()
+                    await throttle_.await_next()
                     call_counter = 1
                 else:
                     if inspect.iscoroutinefunction(on_fail):
