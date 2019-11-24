@@ -1,6 +1,6 @@
-============================================
-Welcome to Throttling-Utils's documentation!
-============================================
+===========================
+Welcome to Throttling-Utils
+===========================
 
 This project offers some convenient tools for throttling and controlling
 the execution of functions or iterative blocks of Python code.
@@ -23,6 +23,9 @@ Library Installation
 Getting started
 ===============
 
+Throttle
+--------
+
 A basic use for throttling the execution of a code block is using
 :func:`Throttle.loop() <throttle.Throttle.loop>`
 (or :func:`Throttle.aloop() <throttle.Throttle.aloop>` for
@@ -33,7 +36,7 @@ seconds:
 
     from throttle import Throttle
 
-    rate = 24.0     # Target rate
+    rate = 2.0     # Target rate
     t = Throttle(interval=(1 / rate))
 
     for i in t.loop():
@@ -41,22 +44,23 @@ seconds:
         print(f"Iteration {i}")
 
 
-The next example code records a video file from the default video source at an
-accurate frame rate of 24 fps using OpenCV.
+The next example code records a 15-seconds video file from the default video
+source at an accurate frame rate of 24 fps using
+`OpenCV <https://opencv-python-tutroals.readthedocs.io/en/latest/>`_.
 
 .. code-block:: python3
 
     import cv2
     from throttle import Throttle
 
-    rate = 24.0     # Target frame rate
+    rate = 24.0             # Target frame rate
     cap = cv2.VideoCapture(0)
     out = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'XVID'),
                           rate, (640, 480))
 
     t = Throttle(interval=(1 / rate))
 
-    for _ in t.loop():
+    for _ in t.loop(duration=15.0):
         ret, frame = cap.read()    # Frame capture
         out.write(frame)           # Save frame to output file
 
@@ -71,18 +75,59 @@ because of the time required for frame capture. If you also add image
 processing (motion detection, text overlay...), the delay could cause the
 output to be completely out of sync.
 
+Throttle decorators
+-------------------
+
+You can also use :func:`~throttle.throttle` and :func:`~throttle.athrottle`
+decorators to limit the number of calls to a function. In the next example,
+the function ``hello()`` is decorated to rate-limit the ``/throttled``
+endpoint, using a `Flask <https://palletsprojects.com/p/flask/>`_ server.
+Only 2 requests will be served every 5 seconds.
+
+.. code-block::
+
+    from flask import Flask
+    from throttle import throttle
+
+    app = Flask(__name__)
+
+    @app.route("/throttled")
+    @throttle(limit=2, interval=5, on_fail=("Limit reached :(", 429))
+    def hello():
+        return "Hi, Throttle!"
+
+    if __name__ == '__main__':
+        app.run()
+
+Rate Meter
+----------
+
+:class:`~rate_meter.RateMeter` class is useful for measuring the rate of an
+iterative code taking into account only the last few seconds, so the measured
+value is kept updated.
+
+The next code block prints the execution rate of a loop that starts looping
+at 10 ips (iterations per second) and decreases up o 5 ips. In each iteration,
+the rate is displayed and updated taking into account the iterations history
+of the last 2 seconds.
+
+.. code-block::
+
+    import time
+    from rate_meter import RateMeter
+
+    rate_meter = RateMeter(interval=2.0)
+
+    for i in range(100):
+        rate_meter.update()
+        measured_rate = rate_meter.rate()
+        print(f"Rate: {rate_meter.rate()}")
+        time.sleep(0.1 + i * 0.001)
+
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :hidden:
+   :caption: Utils
 
    modules/throttle
    modules/rate_meter
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
