@@ -99,6 +99,8 @@ Only 2 requests will be served every 5 seconds.
     if __name__ == '__main__':
         app.run()
 
+Decorators can be nested to create more complex throttling rules.
+
 Rate Meter
 ----------
 
