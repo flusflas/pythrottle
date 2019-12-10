@@ -11,6 +11,8 @@ pytest = "*"
 pytest-xdist = "*"
 radon = "*"
 pytest-cov = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
 
 [packages]
 
