@@ -5,7 +5,7 @@ Throttling-Utils
 [![coverage report](https://gitlab.com/flusflas/throttling-utils/badges/develop/coverage.svg)](https://gitlab.com/flusflas/throttling-utils/commits/develop)
 
 This project offers some convenient tools for throttling and controlling
-the execution of functions or iterative blocks of Python code.
+the execution timing of functions or iterative blocks of Python code.
 
 Key Features
 ------------
