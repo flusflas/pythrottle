@@ -1,8 +1,8 @@
 Throttling-Utils
 ================
 
-[![pipeline status](https://gitlab.com/flusflas/throttling-utils/badges/develop/pipeline.svg)](https://gitlab.com/flusflas/throttling-utils/commits/develop)
-[![coverage report](https://gitlab.com/flusflas/throttling-utils/badges/develop/coverage.svg)](https://gitlab.com/flusflas/throttling-utils/commits/develop)
+[![pipeline status](https://gitlab.com/flusflas/throttling-utils/badges/develop/pipeline.svg)](https://gitlab.com/flusflas/throttling-utils/pipelines)
+[![coverage report](https://gitlab.com/flusflas/throttling-utils/badges/develop/coverage.svg)](https://gitlab.com/flusflas/throttling-utils)
 
 This project offers some convenient tools for throttling and controlling
 the execution timing of functions or iterative blocks of Python code.
