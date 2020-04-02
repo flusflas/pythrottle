@@ -15,8 +15,8 @@ Key Features
  - Rate limiting consecutive function calls
  - Rate measurement for loops
 
-Library Installation
---------------------
+Installation
+------------
 
 ``` console
 $ pip install throttling-utils
@@ -106,7 +106,7 @@ taking into account only the last few seconds, so the measured value is
 kept updated.
 
 The next code block prints the execution rate of a loop that starts
-looping at 10 ips (iterations per second) and decreases up o 5 ips. In
+looping at 10 ips (iterations per second) and decreases up to 5 ips. In
 each iteration, the rate is displayed and updated taking into account
 the iterations history of the last 2 seconds.
 

@@ -13,8 +13,8 @@ Key Features
  - Rate limiting consecutive function calls
  - Rate measurement for loops
 
-Library Installation
-====================
+Installation
+============
 
 .. code-block:: bash
 
