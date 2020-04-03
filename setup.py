@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://github.com/pypa/sampleproject",
     # packages=setuptools.find_packages(),
     py_modules=['throttle'],
-    package_dir={'': 'src'},
+    package_dir={'': 'pythrottle'},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

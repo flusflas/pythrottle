@@ -13,11 +13,11 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.append('../src')
+sys.path.append('../pythrottle')
 
 # -- Project information -----------------------------------------------------
 
-project = 'Throttling-Utils'
+project = 'pythrottle'
 copyright = '2019, Flus Flas'
 author = 'Flus Flas'
 

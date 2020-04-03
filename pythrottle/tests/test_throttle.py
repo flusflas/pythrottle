@@ -5,8 +5,8 @@ import time
 import pytest
 import uvloop
 
-from src.throttle import Throttle, throttle, athrottle
-from src.tests.profiler import Profiler
+from pythrottle.throttle import Throttle, throttle, athrottle
+from pythrottle.tests.profiler import Profiler
 
 uvloop.install()
 RATE = 10000

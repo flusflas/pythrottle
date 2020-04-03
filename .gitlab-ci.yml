@@ -10,7 +10,9 @@ stages:
 
 test:
   stage: test
+  only:
+    - develop   # TODO: Change to master
   script:
-  - pipenv run pytest --cov=./src
+  - pipenv run pytest --cov=./pythrottle
   - pipenv run coverage report -m
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'

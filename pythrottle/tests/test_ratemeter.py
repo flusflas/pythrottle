@@ -1,7 +1,7 @@
 import pytest
 
-from src.rate_meter import RateMeter
-from src.throttle import Throttle
+from pythrottle.rate_meter import RateMeter
+from pythrottle.throttle import Throttle
 
 
 RATE = 1000
