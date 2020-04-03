@@ -1,15 +1,15 @@
 .. raw:: html
 
     <style>
-        .gray {color:yellowgreen}
-        .green {color:gray}
+        .green {color:yellowgreen}
+        .gray {color:gray}
     </style>
 
 .. role:: gray
 .. role:: green
 
-:gray:`py`\ :green:`throttle`
-===================================
+:green:`py`\ :gray:`throttle`
+=============================
 
 |pipeline status| |coverage report|
 
