@@ -10,6 +10,8 @@ stages:
 
 test:
   stage: test
+  only:
+    - develop   # TODO: Change to master
   script:
   - pipenv run pytest --cov=./src
   - pipenv run coverage report -m
