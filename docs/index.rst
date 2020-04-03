@@ -1,5 +1,5 @@
-Throttling-Utils
-================
+pythrottle
+==========
 
 |pipeline status| |coverage report|
 
@@ -19,7 +19,7 @@ Installation
 
 .. code:: console
 
-    $ pip install throttling-utils
+    $ pip install pythrottle
 
 Getting started
 ---------------
@@ -127,10 +127,10 @@ the iterations history of the last 2 seconds.
         print(f"Rate: {rate_meter.rate()}")
         time.sleep(0.1 + i * 0.001)
 
-.. |pipeline status| image:: https://gitlab.com/flusflas/throttling-utils/badges/develop/pipeline.svg
-   :target: https://gitlab.com/flusflas/throttling-utils/pipelines
-.. |coverage report| image:: https://gitlab.com/flusflas/throttling-utils/badges/develop/coverage.svg
-   :target: https://gitlab.com/flusflas/throttling-utils
+.. |pipeline status| image:: https://gitlab.com/flusflas/pythrottle/badges/develop/pipeline.svg
+   :target: https://gitlab.com/flusflas/pythrottle/pipelines
+.. |coverage report| image:: https://gitlab.com/flusflas/pythrottle/badges/develop/coverage.svg
+   :target: https://gitlab.com/flusflas/pythrottle
 
 
 .. toctree::

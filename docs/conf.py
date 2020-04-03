@@ -17,7 +17,7 @@ sys.path.append('../src')
 
 # -- Project information -----------------------------------------------------
 
-project = 'Throttling-Utils'
+project = 'pythrottle'
 copyright = '2019, Flus Flas'
 author = 'Flus Flas'
 
