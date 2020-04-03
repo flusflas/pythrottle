@@ -1,23 +1,23 @@
 #!/usr/bin/python
 
 
-def add_links_to_doc(readme):
-    readme = readme.replace("``Throttle.loop()``",
-                            ":func:`Throttle.loop() <throttle.Throttle.loop>`")
+def add_links_to_doc(doc):
+    doc = doc.replace("``Throttle.loop()``",
+                      ":func:`Throttle.loop() <throttle.Throttle.loop>`")
 
-    readme = readme.replace("``Throttle.aloop()``",
-                            ":func:`Throttle.aloop() <throttle.Throttle.aloop>`")
+    doc = doc.replace("``Throttle.aloop()``",
+                      ":func:`Throttle.aloop() <throttle.Throttle.aloop>`")
 
-    readme = readme.replace("``throttle.throttle()``",
-                            ":func:`~throttle.throttle`")
+    doc = doc.replace("``throttle.throttle()``",
+                      ":func:`~throttle.throttle`")
 
-    readme = readme.replace("``throttle.athrottle()``",
-                            ":func:`~throttle.athrottle`")
+    doc = doc.replace("``throttle.athrottle()``",
+                      ":func:`~throttle.athrottle`")
 
-    readme = readme.replace("``RateMeter``",
-                            ":class:`~rate_meter.RateMeter`")
+    doc = doc.replace("``RateMeter``",
+                      ":class:`~rate_meter.RateMeter`")
 
-    return readme
+    return doc
 
 
 def main():

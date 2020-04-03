@@ -254,6 +254,7 @@ async def test_async_await_next_tasks(throttle_fxt, profiler):
     :func:`Throttle.await_next` to wait between intervals.
     For each interval, an asynchronous task is created.
     """
+
     async def aux_task(m: Throttle):
         await m.await_next()
 
@@ -266,7 +267,8 @@ async def test_async_await_next_tasks(throttle_fxt, profiler):
         while remaining > 0:
             size = remaining if remaining < max_tasks else max_tasks
             remaining -= size
-            await asyncio.gather(*(aux_task(throttle_fxt) for _ in range(size)))
+            await asyncio.gather(*(aux_task(throttle_fxt)
+                                   for _ in range(size)))
 
     assert_profiler_results(profiler, throttle_fxt)
 
