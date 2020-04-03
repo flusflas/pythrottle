@@ -10,7 +10,7 @@ from src.tests.profiler import Profiler
 
 uvloop.install()
 RATE = 10000
-MAX_ERROR = 0.03 / 100
+MAX_ERROR = float(os.getenv("THROTTLE_TEST_MAX_ERROR", 0.03)) / 100
 TESTS_DURATION = 10
 
 
