@@ -131,3 +131,11 @@ the iterations history of the last 2 seconds.
    :target: https://gitlab.com/flusflas/throttling-utils/pipelines
 .. |coverage report| image:: https://gitlab.com/flusflas/throttling-utils/badges/develop/coverage.svg
    :target: https://gitlab.com/flusflas/throttling-utils
+
+
+.. toctree::
+   :hidden:
+   :caption: Reference
+
+   modules/throttle
+   modules/rate_meter
