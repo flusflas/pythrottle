@@ -1,5 +1,15 @@
-pythrottle
-==========
+.. raw:: html
+
+    <style>
+        .gray {color:yellowgreen}
+        .green {color:gray}
+    </style>
+
+.. role:: gray
+.. role:: green
+
+:gray:`py`\ :green:`throttle`
+===================================
 
 |pipeline status| |coverage report|
 
