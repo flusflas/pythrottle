@@ -28,7 +28,7 @@ Throttle
 ~~~~~~~~
 
 A basic use for throttling the execution of a code block is using
-:func:`Throttle.loop() <throttle.Throttle.loop>` (or :func:`Throttle.aloop() <throttle.Throttle.aloop>` for asynchronous mode).
+``Throttle.loop()`` (or ``Throttle.aloop()`` for asynchronous mode).
 This will allow execution of the code every ``1 / rate`` seconds:
 
 .. code:: python
@@ -78,7 +78,7 @@ be completely out of sync.
 Throttle decorators
 ~~~~~~~~~~~~~~~~~~~
 
-You can also use :func:`~throttle.throttle` and :func:`~throttle.athrottle`
+You can also use ``throttle.throttle()`` and ``throttle.athrottle()``
 decorators to limit the number of calls to a function. In the next
 example, the function ``hello()`` is decorated to rate-limit the
 ``/throttled`` endpoint, using a
@@ -105,7 +105,7 @@ Decorators can be nested to create more complex throttling rules.
 Rate Meter
 ~~~~~~~~~~
 
-:class:`~rate_meter.RateMeter` class is useful for measuring the rate of an iterative
+``RateMeter`` class is useful for measuring the rate of an iterative
 code taking into account only the last few seconds, so the measured
 value is kept updated.
 
