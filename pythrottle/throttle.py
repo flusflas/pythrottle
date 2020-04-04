@@ -225,10 +225,9 @@ def throttle(limit=1, interval=1.0, wait=False, on_fail=None):
 
 def athrottle(limit=1, interval=1.0, wait=False, on_fail=None):
     """
-    Decorator to limit the number of calls to a synchronous or
-    asynchronous function in an interval of time. It ensures that the
-    decorated function is not called more than `limit` times in the
-    same time interval.
+    Decorator to limit the number of calls to a synchronous or asynchronous
+    function in an interval of time. It ensures that the decorated function
+    is not called more than `limit` times in the same time interval.
     If limit is reached, it can return a custom result or sleep until
     the next time interval.
     Do not use this function to decorate a synchronous function (use
