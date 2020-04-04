@@ -14,7 +14,7 @@ setuptools.setup(
                 "timing of Python code.",
     long_description=long_description,
     long_description_content_type="text/x-rst",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/flusflas/pythrottle",
     packages=setuptools.find_packages(exclude=("pythrottle.tests",)),
     classifiers=[
         'Development Status :: 4 - Beta',
