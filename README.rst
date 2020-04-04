@@ -5,8 +5,8 @@ pythrottle
 
 .. |pipeline status| image:: https://travis-ci.com/flusflas/pythrottle.svg?branch=develop
    :target: https://travis-ci.com/github/flusflas/pythrottle
-.. |coverage report| image:: https://gitlab.com/flusflas/pythrottle/badges/develop/coverage.svg
-   :target: https://gitlab.com/flusflas/pythrottle
+.. |coverage report| image:: https://codecov.io/gh/flusflas/pythrottle/branch/develop/graph/badge.svg
+   :target: https://codecov.io/gh/flusflas/pythrottle
 
 This project offers some convenient tools for throttling and controlling
 the execution timing of functions or iterative blocks of Python code.
