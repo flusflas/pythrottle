@@ -1,17 +1,12 @@
-.. raw:: html
-
-    <style>
-        .green {color:yellowgreen}
-        .gray {color:gray}
-    </style>
-
-.. role:: gray
-.. role:: green
-
-:green:`py`\ :gray:`throttle`
-=============================
+pythrottle
+==========
 
 |pipeline status| |coverage report|
+
+.. |pipeline status| image:: https://gitlab.com/flusflas/pythrottle/badges/develop/pipeline.svg
+   :target: https://gitlab.com/flusflas/pythrottle/pipelines
+.. |coverage report| image:: https://gitlab.com/flusflas/pythrottle/badges/develop/coverage.svg
+   :target: https://gitlab.com/flusflas/pythrottle
 
 This project offers some convenient tools for throttling and controlling
 the execution timing of functions or iterative blocks of Python code.
@@ -19,10 +14,10 @@ the execution timing of functions or iterative blocks of Python code.
 Key Features
 ------------
 
--  Simple and time-accurate loop iterations
--  Support for synchronous and asynchronous programming
--  Rate limiting consecutive function calls
--  Rate measurement for loops
+-  Simple and time-accurate loop iterations.
+-  Support for synchronous and asynchronous programming.
+-  Rate limiting consecutive function calls.
+-  Rate measurement for loops.
 
 Installation
 ------------
@@ -136,16 +131,3 @@ the iterations history of the last 2 seconds.
         measured_rate = rate_meter.rate()
         print(f"Rate: {rate_meter.rate()}")
         time.sleep(0.1 + i * 0.001)
-
-.. |pipeline status| image:: https://gitlab.com/flusflas/pythrottle/badges/develop/pipeline.svg
-   :target: https://gitlab.com/flusflas/pythrottle/pipelines
-.. |coverage report| image:: https://gitlab.com/flusflas/pythrottle/badges/develop/coverage.svg
-   :target: https://gitlab.com/flusflas/pythrottle
-
-
-.. toctree::
-   :hidden:
-   :caption: Reference
-
-   modules/throttle
-   modules/rate_meter
