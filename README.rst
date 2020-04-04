@@ -3,8 +3,8 @@ pythrottle
 
 |pipeline status| |coverage report|
 
-.. |pipeline status| image:: https://gitlab.com/flusflas/pythrottle/badges/develop/pipeline.svg
-   :target: https://gitlab.com/flusflas/pythrottle/pipelines
+.. |pipeline status| image:: https://travis-ci.com/flusflas/pythrottle.svg?branch=develop
+   :target: https://travis-ci.com/github/flusflas/pythrottle
 .. |coverage report| image:: https://gitlab.com/flusflas/pythrottle/badges/develop/coverage.svg
    :target: https://gitlab.com/flusflas/pythrottle
 
