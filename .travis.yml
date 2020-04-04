@@ -8,7 +8,7 @@ install:
   - pipenv install --dev
 
 script:
-  - pytest --cov=./pythrottle -n 5
+  - pytest --cov=./pythrottle
 
 env:
   - THROTTLE_TEST_MAX_ERROR=0.1
