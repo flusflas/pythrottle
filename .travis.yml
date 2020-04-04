@@ -1,0 +1,22 @@
+language: python
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.8-dev"
+
+install:
+  - pipenv install --dev
+
+script:
+  - pytest --cov=./pythrottle
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+env:
+  - THROTTLE_TEST_MAX_ERROR=0.1
+
+branches:
+  only:
+    - master
