@@ -5,10 +5,13 @@ python:
   - "3.8"
 
 install:
-  - pip install tox
+  - pipenv install --dev
 
 script:
-  - tox
+  - pytest --cov=./pythrottle -n 10
+
+env:
+  - THROTTLE_TEST_MAX_ERROR=0.1
 
 branches:
   only:
