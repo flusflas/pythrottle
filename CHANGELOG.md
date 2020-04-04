@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PyPI, Python versions and documentation badges.
 - Update Sphinx documentation.
 
-## [0.0.1](https://github.com/flusflas/pythrottle/releases/tag/v0.1.0) - 2020-04-04
+## [0.1.0](https://github.com/flusflas/pythrottle/releases/tag/v0.1.0) - 2020-04-04
 ### Added
 - First version. Changelog started.
 - `throttle` and `rate_meter` modules.
