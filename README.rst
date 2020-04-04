@@ -3,9 +3,9 @@ pythrottle
 
 |pipeline status| |coverage report|
 
-.. |pipeline status| image:: https://travis-ci.com/flusflas/pythrottle.svg?branch=develop
+.. |pipeline status| image:: https://travis-ci.com/flusflas/pythrottle.svg?branch=master
    :target: https://travis-ci.com/github/flusflas/pythrottle
-.. |coverage report| image:: https://codecov.io/gh/flusflas/pythrottle/branch/develop/graph/badge.svg
+.. |coverage report| image:: https://codecov.io/gh/flusflas/pythrottle/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/flusflas/pythrottle
 
 This project offers some convenient tools for throttling and controlling
