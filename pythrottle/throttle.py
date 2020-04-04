@@ -127,14 +127,8 @@ class Throttle:
         :return:          Yields the number of intervals elapsed since the
                           function was called.
         """
-        if max_ticks is not None and duration is not None:
-            raise ValueError("max_ticks and duration cannot be set at"
-                             "the same time")
-        self._check()
+        max_ticks = self._check_loop_params(duration, max_ticks)
         ticks = 0
-
-        if duration is not None:
-            max_ticks = math.ceil(duration / self.interval)
 
         while max_ticks is None or ticks < max_ticks:
             self.wait_next()
@@ -159,19 +153,27 @@ class Throttle:
         :return:          Yields the number of intervals elapsed since the
                           function was called.
         """
-        if max_ticks is not None and duration is not None:
-            raise ValueError("max_ticks and duration cannot be set at"
-                             "the same time")
-        self._check()
+        max_ticks = self._check_loop_params(duration, max_ticks)
         ticks = 0
-
-        if duration is not None:
-            max_ticks = math.ceil(duration / self.interval)
 
         while max_ticks is None or ticks < max_ticks:
             await self.await_next()
             yield ticks
             ticks += 1
+
+    def _check_loop_params(self, duration, max_ticks):
+        """
+        Helper function for :func:`loop` and :func:`aloop`.
+        """
+        if max_ticks is not None and duration is not None:
+            raise ValueError("max_ticks and duration cannot be set at"
+                             "the same time")
+        self._check()
+
+        if duration is not None:
+            max_ticks = math.ceil(duration / self.interval)
+
+        return max_ticks
 
 
 def throttle(limit=1, interval=1.0, wait=False, on_fail=None):
