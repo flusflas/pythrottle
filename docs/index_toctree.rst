@@ -2,6 +2,6 @@
    :hidden:
    :caption: Reference
 
-   index
+   self
    modules/throttle
    modules/rate_meter
