@@ -5,10 +5,10 @@
 
 |pipeline status| |coverage report|
 
-.. |pipeline status| image:: https://gitlab.com/flusflas/pythrottle/badges/develop/pipeline.svg
-   :target: https://gitlab.com/flusflas/pythrottle/pipelines
-.. |coverage report| image:: https://gitlab.com/flusflas/pythrottle/badges/develop/coverage.svg
-   :target: https://gitlab.com/flusflas/pythrottle
+.. |pipeline status| image:: https://travis-ci.com/flusflas/pythrottle.svg?branch=develop
+   :target: https://travis-ci.com/github/flusflas/pythrottle
+.. |coverage report| image:: https://codecov.io/gh/flusflas/pythrottle/branch/develop/graph/badge.svg
+   :target: https://codecov.io/gh/flusflas/pythrottle
 
 This project offers some convenient tools for throttling and controlling
 the execution timing of functions or iterative blocks of Python code.
@@ -133,5 +133,10 @@ the iterations history of the last 2 seconds.
         measured_rate = rate_meter.rate()
         print(f"Rate: {rate_meter.rate()}")
         time.sleep(0.1 + i * 0.001)
+
+License
+-------
+
+Distributed under the terms of the `MIT License <LICENSE>`__.
 
 .. include:: index_toctree.rst
