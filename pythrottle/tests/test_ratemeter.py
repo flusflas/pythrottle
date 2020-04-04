@@ -9,13 +9,16 @@ INTERVAL = 2.0
 MAX_ERROR = 0.01 / 100
 
 
-@pytest.fixture
-def throttle():
-    return Throttle(interval=(1 / RATE))
+@pytest.fixture(name="throttle")
+def throttle_fxt():
+    """
+    Yields a :class:`Throttle` instance with the default rate.
+    """
+    yield Throttle(interval=(1 / RATE))
 
 
-@pytest.fixture
-def rate_meter():
+@pytest.fixture(name="rate_meter")
+def rate_meter_fxt():
     return RateMeter(interval=INTERVAL)
 
 
