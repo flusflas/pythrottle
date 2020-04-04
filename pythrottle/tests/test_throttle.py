@@ -10,7 +10,7 @@ from pythrottle.tests.profiler import Profiler
 
 uvloop.install()
 RATE = 10000
-MAX_ERROR = float(os.getenv("THROTTLE_TEST_MAX_ERROR", 0.03)) / 100
+MAX_ERROR = float(os.getenv("THROTTLE_TEST_MAX_ERROR", "0.03")) / 100
 TESTS_DURATION = 10
 
 
@@ -23,7 +23,7 @@ def current_test_name():
     return os.environ.get('PYTEST_CURRENT_TEST').split(':')[-1].split(' ')[0]
 
 
-@pytest.fixture
+@pytest.fixture(name="throttle_obj")
 def throttle_fxt():
     """
     Yields a :class:`Throttle` instance with the default rate.
@@ -31,18 +31,18 @@ def throttle_fxt():
     yield Throttle(interval=(1 / RATE))
 
 
-@pytest.fixture
-def profiler():
+@pytest.fixture(name="profiler")
+def profiler_fxt():
     """
     Yields a :class:`Profiler` instance with the default rate and number of
     iterations.
     """
     iter_count = TESTS_DURATION * RATE
-    profiler = Profiler(iter_count, target_rate=RATE)
-    yield profiler
+    yield Profiler(iter_count, target_rate=RATE)
 
 
 def log_results(measured_rate, error):
+    """ Logs the measured rate and error. """
     test_name = current_test_name()
     print(f"{test_name} -> (Rate: {measured_rate}, Error: {100 * error:.3f}%)")
 
@@ -63,18 +63,18 @@ def assert_profiler_results(profiler: Profiler, throttle: Throttle,
     assert throttle.ticks == profiler.iter_count
 
 
-def test_sync_elapsed_exact(throttle_fxt, profiler):
+def test_sync_elapsed_exact(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using :func:`Throttle.elapsed`
     to wait between intervals with `exact` parameter equals to True.
     """
     with profiler:
         sleep_time = (0.01 / RATE) if (0.01 / RATE) < 0.001 else 0.001
-        for i in range(profiler.iter_count):
-            while not throttle_fxt.elapsed(exact=True):
+        for _ in range(profiler.iter_count):
+            while not throttle_obj.elapsed(exact=True):
                 time.sleep(sleep_time)
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
 
 
 def test_sync_elapsed_inexact():
@@ -85,46 +85,46 @@ def test_sync_elapsed_inexact():
     rate = 5
     simulated_rate = 4
     max_error = 0.01
-    throttle_fxt = Throttle(interval=(1 / rate))
+    throttle_obj = Throttle(interval=(1 / rate))
     iter_count = TESTS_DURATION * rate
 
     with Profiler(iter_count, target_rate=simulated_rate) as profiler:
-        for i in range(iter_count):
-            while not throttle_fxt.elapsed(exact=False):
+        for _ in range(iter_count):
+            while not throttle_obj.elapsed(exact=False):
                 time.sleep(1 / simulated_rate)
 
-    assert_profiler_results(profiler, throttle_fxt, max_error)
+    assert_profiler_results(profiler, throttle_obj, max_error)
 
 
-def test_sync_wait_next(throttle_fxt, profiler):
+def test_sync_wait_next(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.wait_next` to wait between intervals.
     """
     with profiler:
-        for i in range(profiler.iter_count):
-            throttle_fxt.wait_next()
+        for _ in range(profiler.iter_count):
+            throttle_obj.wait_next()
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
 
 
-def test_sync_loop_no_arguments(throttle_fxt, profiler):
+def test_sync_loop_no_arguments(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using :func:`Throttle.loop`
     to iterate between intervals without arguments.
     """
     ticks = -1
     with profiler:
-        for i in throttle_fxt.loop():
+        for i in throttle_obj.loop():
             ticks += 1
             assert ticks == i
             if ticks == profiler.iter_count - 1:
                 break
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
 
 
-def test_sync_loop_max_ticks(throttle_fxt, profiler):
+def test_sync_loop_max_ticks(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.loop` to iterate between intervals for a
@@ -132,15 +132,15 @@ def test_sync_loop_max_ticks(throttle_fxt, profiler):
     """
     ticks = -1
     with profiler:
-        for i in throttle_fxt.loop(max_ticks=profiler.iter_count):
+        for i in throttle_obj.loop(max_ticks=profiler.iter_count):
             ticks += 1
             assert ticks == i
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
     assert i == profiler.iter_count - 1
 
 
-def test_sync_loop_duration(throttle_fxt, profiler):
+def test_sync_loop_duration(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.loop` to iterate between intervals for a
@@ -148,27 +148,27 @@ def test_sync_loop_duration(throttle_fxt, profiler):
     """
     ticks = -1
     with profiler:
-        for i in throttle_fxt.loop(duration=TESTS_DURATION):
+        for i in throttle_obj.loop(duration=TESTS_DURATION):
             ticks += 1
             assert ticks == i
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
     assert i == profiler.iter_count - 1
 
 
-def test_sync_loop_invalid_params(throttle_fxt, profiler):
+def test_sync_loop_invalid_params(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.loop` with invalid parameters.
     """
     with pytest.raises(ValueError):
         with profiler:
-            gen = throttle_fxt.loop(max_ticks=profiler.iter_count,
+            gen = throttle_obj.loop(max_ticks=profiler.iter_count,
                                     duration=TESTS_DURATION)
             next(gen)
 
 
-def test_restart(throttle_fxt, profiler):
+def test_restart(throttle_obj, profiler):
     """
     Tests the behavior of a single Throttle instance iterating during two
     periods of time separate separated by a short sleep. After this break,
@@ -177,27 +177,27 @@ def test_restart(throttle_fxt, profiler):
     """
     ticks = -1
     with profiler:
-        for i in throttle_fxt.loop(max_ticks=profiler.iter_count):
+        for i in throttle_obj.loop(max_ticks=profiler.iter_count):
             ticks += 1
             assert ticks == i
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
     assert i == profiler.iter_count - 1
 
     time.sleep(1)
-    throttle_fxt.restart()
+    throttle_obj.restart()
     ticks = -1
 
     with profiler:
-        for i in throttle_fxt.loop(max_ticks=profiler.iter_count):
+        for i in throttle_obj.loop(max_ticks=profiler.iter_count):
             ticks += 1
             assert ticks == i
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
     assert i == profiler.iter_count - 1
 
 
-def test_no_restart(throttle_fxt, profiler):
+def test_no_restart(throttle_obj, profiler):
     """
     Tests the behavior of a single Throttle instance iterating during two
     periods of time separate separated by a short sleep. After this break,
@@ -209,18 +209,18 @@ def test_no_restart(throttle_fxt, profiler):
     ticks = -1
 
     with profiler:
-        for i in throttle_fxt.loop(max_ticks=profiler.iter_count):
+        for i in throttle_obj.loop(max_ticks=profiler.iter_count):
             ticks += 1
             assert ticks == i
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
     assert i == profiler.iter_count - 1
 
     time.sleep(rest_time)
     ticks = -1
 
     with profiler:
-        for i in throttle_fxt.loop(max_ticks=profiler.iter_count):
+        for i in throttle_obj.loop(max_ticks=profiler.iter_count):
             ticks += 1
             assert ticks == i
 
@@ -230,25 +230,25 @@ def test_no_restart(throttle_fxt, profiler):
 
     log_results(measured_rate=profiler.measured_rate, error=error)
     assert abs(error) < max_error
-    assert throttle_fxt.ticks == 2 * profiler.iter_count
+    assert throttle_obj.ticks == 2 * profiler.iter_count
     assert i == profiler.iter_count - 1
 
 
 @pytest.mark.asyncio
-async def test_async_await_next(throttle_fxt, profiler):
+async def test_async_await_next(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.await_next` to wait between intervals.
     """
     with profiler:
-        for i in range(profiler.iter_count):
-            await throttle_fxt.await_next()
+        for _ in range(profiler.iter_count):
+            await throttle_obj.await_next()
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
 
 
 @pytest.mark.asyncio
-async def test_async_await_next_tasks(throttle_fxt, profiler):
+async def test_async_await_next_tasks(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.await_next` to wait between intervals.
@@ -267,31 +267,31 @@ async def test_async_await_next_tasks(throttle_fxt, profiler):
         while remaining > 0:
             size = remaining if remaining < max_tasks else max_tasks
             remaining -= size
-            await asyncio.gather(*(aux_task(throttle_fxt)
+            await asyncio.gather(*(aux_task(throttle_obj)
                                    for _ in range(size)))
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
 
 
 @pytest.mark.asyncio
-async def test_sync_aloop_no_arguments(throttle_fxt, profiler):
+async def test_sync_aloop_no_arguments(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using :func:`Throttle.aloop`
     to iterate between intervals without arguments.
     """
     ticks = -1
     with profiler:
-        async for i in throttle_fxt.aloop():
+        async for i in throttle_obj.aloop():
             ticks += 1
             assert ticks == i
             if ticks == profiler.iter_count - 1:
                 break
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
 
 
 @pytest.mark.asyncio
-async def test_async_aloop_max_ticks(throttle_fxt, profiler):
+async def test_async_aloop_max_ticks(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.aloop` to iterate between intervals for a
@@ -299,16 +299,16 @@ async def test_async_aloop_max_ticks(throttle_fxt, profiler):
     """
     ticks = -1
     with profiler:
-        async for i in throttle_fxt.aloop(max_ticks=profiler.iter_count):
+        async for i in throttle_obj.aloop(max_ticks=profiler.iter_count):
             ticks += 1
             assert ticks == i
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
     assert i == profiler.iter_count - 1
 
 
 @pytest.mark.asyncio
-async def test_async_aloop_duration(throttle_fxt, profiler):
+async def test_async_aloop_duration(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.aloop` to iterate between intervals for a
@@ -316,23 +316,23 @@ async def test_async_aloop_duration(throttle_fxt, profiler):
     """
     ticks = -1
     with profiler:
-        async for i in throttle_fxt.aloop(duration=TESTS_DURATION):
+        async for i in throttle_obj.aloop(duration=TESTS_DURATION):
             ticks += 1
             assert ticks == i
 
-    assert_profiler_results(profiler, throttle_fxt)
+    assert_profiler_results(profiler, throttle_obj)
     assert i == profiler.iter_count - 1
 
 
 @pytest.mark.asyncio
-async def test_async_loop_invalid_params(throttle_fxt, profiler):
+async def test_async_loop_invalid_params(throttle_obj, profiler):
     """
     Tests the behavior of a Throttle instance using
     :func:`Throttle.aloop` with invalid parameters.
     """
     with pytest.raises(ValueError):
         with profiler:
-            gen = throttle_fxt.aloop(max_ticks=profiler.iter_count,
+            gen = throttle_obj.aloop(max_ticks=profiler.iter_count,
                                      duration=TESTS_DURATION)
             await gen.__anext__()
 
@@ -349,11 +349,11 @@ def test_sync_decorator():
         return "Error"
 
     @throttle(limit=5, interval=1, on_fail=on_fail)
-    def foo():
+    def func():
         return "OK"
 
     for i in range(23):
-        result = foo()
+        result = func()
         if result == "OK":
             call_counter += 1
         else:
@@ -372,12 +372,12 @@ def test_sync_decorator_wait():
     call_counter = 0
 
     @throttle(limit=5, interval=0.5, wait=True)
-    def foo():
+    def func():
         return "OK"
 
     with Profiler() as profiler:
-        for i in range(25):
-            result = foo()
+        for _ in range(25):
+            result = func()
             if result:
                 call_counter += 1
 
@@ -398,19 +398,10 @@ async def test_async_decorator_sync_error():
         return "Error"
 
     @athrottle(limit=5, interval=1, on_fail=on_fail)
-    def foo():
+    def func():
         return "OK"
 
-    for i in range(23):
-        result = await foo()
-        if result == "OK":
-            call_counter += 1
-        else:
-            fail_counter += 1
-        time.sleep(0.1)
-
-    assert call_counter == 13
-    assert fail_counter == 10
+    await assert_async_decorator_error(call_counter, fail_counter, func)
 
 
 @pytest.mark.asyncio
@@ -426,11 +417,19 @@ async def test_async_decorator_async_error():
         return "Error"
 
     @athrottle(limit=5, interval=1, on_fail=on_fail)
-    async def foo():
+    async def func():
         return "OK"
 
-    for i in range(23):
-        result = await foo()
+    await assert_async_decorator_error(call_counter, fail_counter, func)
+
+
+async def assert_async_decorator_error(call_counter, fail_counter, func):
+    """
+    Helper function for :func:`test_async_decorator_sync_error`
+    and :func:`test_async_decorator_async_error`.
+    """
+    for _ in range(23):
+        result = await func()
         if result == "OK":
             call_counter += 1
         else:
@@ -451,11 +450,11 @@ async def test_async_decorator_value_error():
     fail_counter = 0
 
     @athrottle(limit=5, interval=1, on_fail=7)
-    async def foo():
+    async def func():
         return "OK"
 
-    for i in range(23):
-        result = await foo()
+    for _ in range(23):
+        result = await func()
         if result == "OK":
             call_counter += 1
         elif result == 7:
@@ -475,12 +474,12 @@ async def test_async_decorator_wait():
     call_counter = 0
 
     @athrottle(limit=5, interval=0.5, wait=True)
-    async def foo():
+    async def func():
         return "OK"
 
     with Profiler() as profiler:
-        for i in range(25):
-            result = await foo()
+        for _ in range(25):
+            result = await func()
             if result:
                 call_counter += 1
 
@@ -499,11 +498,11 @@ def test_nested_sync_decorators():
 
     @throttle(limit=2, interval=0.1, on_fail="FAIL_1")
     @throttle(limit=3, interval=0.2, on_fail="FAIL_2")
-    def foo():
+    def func():
         return "OK"
 
     for _ in Throttle(interval=0.01).loop(100):
-        result = foo()
+        result = func()
         if result == "OK":
             call_counter += 1
         elif result == "FAIL_1":
@@ -528,11 +527,11 @@ async def test_nested_async_decorators():
 
     @athrottle(limit=2, interval=0.1, on_fail="FAIL_1")
     @athrottle(limit=3, interval=0.2, on_fail="FAIL_2")
-    async def foo():
+    async def func():
         return "OK"
 
     async for _ in Throttle(interval=0.01).aloop(100):
-        result = await foo()
+        result = await func()
         if result == "OK":
             call_counter += 1
         elif result == "FAIL_1":
