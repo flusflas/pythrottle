@@ -131,3 +131,8 @@ the iterations history of the last 2 seconds.
         measured_rate = rate_meter.rate()
         print(f"Rate: {rate_meter.rate()}")
         time.sleep(0.1 + i * 0.001)
+
+License
+-------
+
+Distributed under the terms of the `MIT License <LICENSE>`__.
