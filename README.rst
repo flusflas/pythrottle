@@ -1,12 +1,18 @@
 pythrottle
 ==========
 
-|pipeline status| |coverage report|
+|pypi version| |python versions| |pipeline status| |coverage report| |docs|
 
 .. |pipeline status| image:: https://travis-ci.com/flusflas/pythrottle.svg?branch=master
    :target: https://travis-ci.com/github/flusflas/pythrottle
 .. |coverage report| image:: https://codecov.io/gh/flusflas/pythrottle/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/flusflas/pythrottle
+.. |python versions| image:: https://img.shields.io/pypi/pyversions/pythrottle.svg
+   :target: https://pypi.org/project/pythrottle/
+.. |pypi version| image:: https://img.shields.io/pypi/v/pythrottle.svg
+   :target: https://pypi.org/project/pythrottle/
+.. |docs| image:: https://readthedocs.org/projects/pythrottle/badge/?version=latest
+   :target: https://pythrottle.readthedocs.io/en/latest/
 
 This project offers some convenient tools for throttling and controlling
 the execution timing of functions or iterative blocks of Python code.
