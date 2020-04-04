@@ -13,7 +13,7 @@ def include_styles(doc):
 
 
 def include_toctree(doc):
-    return ".. include:: index_toctree.rst\n\n" + doc
+    return doc + "\n\n.. include:: index_toctree.rst\n"
 
 
 def add_links_to_doc(doc):
